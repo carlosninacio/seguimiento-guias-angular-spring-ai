@@ -11,13 +11,13 @@
 
 **Tareas:**
 - [X] Crear el **repositorio GitHub**.
-- [ ] Escribir un **README inicial** con descripción breve.
-- [ ] En una hoja o bloc, definir:
-  - Campos del pedido (número de guía, destino, nombre, estado, valor, abono, fecha revisión, fecha archivado, cantidad de pares).
+- [X] Escribir un **README inicial** con descripción breve.
+- [X] En una hoja, definir:
+  - Atributos del pedido (número de guía, destino, nombre, estado, valor, abono, fecha revisión, fecha archivado, cantidad de pares).
   - Acciones del usuario (crear, editar, ver, eliminar, exportar Excel).
   - Boceto visual de la interfaz.
-- [ ] Decidir si habrá **roles** o solo un usuario.
-- [ ] Esquematizar el flujo general:
+- [] Decidir si habrá **roles** o solo un usuario.
+- [] Esquematizar el flujo general:
   > “Registrar pedido → Guardar en base → Visualizar → Actualizar → Exportar Excel”.
 
 📘 **Resultado esperado:** visión clara del proyecto y su alcance.
