@@ -1,7 +1,7 @@
 package cr.seguimiento.controlador;
 
 import cr.seguimiento.modelo.Pedido;
-import cr.seguimiento.servicio.PedidoService;
+import cr.seguimiento.servicio.PedidoServicio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,7 +20,7 @@ public class PedidoControlador {
     private static final Logger logger = LoggerFactory.getLogger(PedidoControlador.class);
 
     @Autowired
-    private PedidoService pedidoServicio;
+    private PedidoServicio pedidoServicio;
 
     @GetMapping("/pedidos") // Configuración para recibir peticiones
     // Peticiones -> http://localhost:8080/seguimiento-app/pedidos
