@@ -10,7 +10,7 @@
 🧩 *Objetivo:* Definir el propósito, flujo y visual del proyecto.  
 
 **Tareas:**
-- [ ] Crear el **repositorio GitHub** (`pedidoApp` o `gestion-pedidos`).
+- [X] Crear el **repositorio GitHub**.
 - [ ] Escribir un **README inicial** con descripción breve.
 - [ ] En una hoja o bloc, definir:
   - Campos del pedido (número de guía, destino, nombre, estado, valor, abono, fecha revisión, fecha archivado, cantidad de pares).
