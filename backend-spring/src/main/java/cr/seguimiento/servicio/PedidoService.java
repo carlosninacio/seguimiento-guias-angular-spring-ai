@@ -15,21 +15,21 @@ public class PedidoService implements IPedidoServicio {
 
     @Override
     public List<Pedido> listarPedidos() {
-        return List.of();
+        return pedidoRepositorio.findAll();
     }
 
     @Override
     public Pedido buscarPedidoPorId(Integer idPedido) {
-        return null;
+        return pedidoRepositorio.findById(idPedido).orElse(null);
     }
 
     @Override
     public void guardarPedido(Pedido pedido) {
-
+        pedidoRepositorio.save(pedido);
     }
 
     @Override
     public void eliminarPedidoPorId(Integer idPedido) {
-
+        pedidoRepositorio.deleteById(idPedido);
     }
 }
