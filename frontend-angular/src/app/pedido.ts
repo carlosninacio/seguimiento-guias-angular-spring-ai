@@ -1,5 +1,5 @@
 export class Pedido {
-    idProducto: number;
+    idPedido: number;
     numeroGuia: String;
     destino: String;
     nombreCliente: String;

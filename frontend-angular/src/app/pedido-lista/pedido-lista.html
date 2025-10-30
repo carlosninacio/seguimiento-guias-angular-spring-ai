@@ -2,8 +2,7 @@
     <div class="container text-center" style="margin:30px">
         <h3>Seguimento de Guias</h3>
     </div>
-    <div class="container">
-        <table class="table table-bordered table-striped table-hover align-middle">
+        <table class="table table-bordered table-striped table-hover align-middle table-sm">
             <thead class="table-primary">
                 <tr>
                     <th scope="col">Guia</th>
@@ -19,31 +18,23 @@
                 </tr>
             </thead>
             <tbody>
-                <tr>
-                    <th scope="row">1</th>
-                    <td>Mark</td>
-                    <td>Otto</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
+                @for (pedido of pedidos; track pedido.idPedido) {
+                <tr [attr.data-id]="pedido.idPedido">
+                    <td>{{ pedido.numeroGuia }}</td>
+                    <td>{{ pedido.destino }}</td>
+                    <td>{{ pedido.nombreCliente }}</td>
+                    <td>{{ pedido.fechaAdmision }}</td>
+                    <td>{{ pedido.estadoPedido }}</td>
+                    <td>{{ pedido.valor | currency:'$':'symbol':'1.0-0' }}</td>
+                    <td>{{ pedido.fechaRevision }}</td>
+                    <td>{{ pedido.fechaArchivado }}</td>
+                    <td>{{ pedido.adelanto | currency:'$':'symbol':'1.0-0' }}</td>
+                    <td>{{ pedido.unidades }}</td>
                 </tr>
-                <tr>
-                    <th scope="row">2</th>
-                    <td>Jacob</td>
-                    <td>Thornton</td>
-                    <td>@fat</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
-                    <td>@mdo</td>
-                </tr>
+                
+
+
+                }
             </tbody>
         </table>
     </div>
-</div>

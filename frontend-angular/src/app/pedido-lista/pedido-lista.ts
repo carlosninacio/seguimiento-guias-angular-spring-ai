@@ -1,10 +1,11 @@
 import { Component, inject } from '@angular/core';
 import { Pedido } from '../pedido';
 import { PedidoService } from '../servicios/pedido';
+import { CurrencyPipe} from '@angular/common';
 
 @Component({
   selector: 'app-pedido-lista',
-  imports: [],
+  imports: [CurrencyPipe],
   templateUrl: './pedido-lista.html'
 })
 export class PedidoLista {
