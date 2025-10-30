@@ -13,4 +13,8 @@ export class PedidoService {
   obtenerPedidosLista(): Observable<Pedido[]> {
     return this.clienteHttp.get<Pedido[]>(this.urlBase);
   }
+
+  agregarPedido(pedido: Pedido): Observable<Object> {
+    return this.clienteHttp.post(this.urlBase, pedido);
+  }
 }

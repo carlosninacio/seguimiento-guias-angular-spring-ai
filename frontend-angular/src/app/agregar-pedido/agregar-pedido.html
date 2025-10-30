@@ -2,54 +2,54 @@
     <div class="container text-center" style="margin:30px">
         <h3>Agregar producto</h3>
     </div>
-    <form>
+    <form (ngSubmit)="onSubmit()">
         <div class="mb-3">
             <label for="numeroGuia" class="form-label">Numero de Guia</label>
-            <input type="text" class="form-control" id="numeroGuia">
+            <input type="text" class="form-control" id="numeroGuia" name="numeroGuia" [(ngModel)] = "pedido.numeroGuia">
             <!-- <input type="text" class="form-control" id="numeroGuia"  aria-describedby="emailHelp">
             <div id="emailHelp" class="form-text">We'll never share your email with anyone else.</div> -->
         </div>
         <div class="mb-3">
             <label for="destino" class="form-label">Destino</label>
-            <input type="text" class="form-control" id="destino">
+            <input type="text" class="form-control" id="destino" name="destino" [(ngModel)] = "pedido.destino">
         </div>
         <div class="mb-3">
             <label for="nombreCliente" class="form-label">Nombre del Cliente</label>
-            <input type="text" class="form-control" id="nombreCliente">
+            <input type="text" class="form-control" id="nombreCliente" name="nombreCliente" [(ngModel)] = "pedido.nombreCliente">
         </div>
         <div class="mb-3">
             <label for="fechaAdmision" class="form-label">Fecha de Admisión</label>
-            <input type="date" class="form-control" id="fechaAdmision">
+            <input type="date" class="form-control" id="fechaAdmision" name="fechaAdmision" [(ngModel)] = "pedido.fechaAdmision">
         </div>
         <div class="mb-3">
             <label for="estadoPedido" class="form-label">Estado del Pedido</label>
-            <input type="text" class="form-control" id="estadoPedido">
+            <input type="text" class="form-control" id="estadoPedido" name="estadoPedido" [(ngModel)] = "pedido.estadoPedido">
         </div>
         <div class="mb-3">
             <label for="valor" class="form-label">Valor</label>
-            <input type="number" class="form-control" id="valor">
+            <input type="number" class="form-control" id="valor" name="valor" [(ngModel)] = "pedido.valor">
         </div>
         <div class="mb-3">
             <label for="fechaRevision" class="form-label">Fecha Revisión</label>
-            <input type="date" class="form-control" id="fechaRevision">
+            <input type="date" class="form-control" id="fechaRevision" name="fechaRevision" [(ngModel)] = "pedido.fechaRevision">
         </div>
         <div class="mb-3">
             <label for="fechaArchivado" class="form-label">Fecha de Archivado</label>
-            <input type="date" class="form-control" id="fechaArchivado">
+            <input type="date" class="form-control" id="fechaArchivado" name="fechaArchivado" [(ngModel)] = "pedido.fechaArchivado">
         </div>
 
         <div class="mb-3">
             <label for="adelanto" class="form-label">Adelanto</label>
-            <input type="number" class="form-control" id="adelanto">
+            <input type="number" class="form-control" id="adelanto" name="adelanto" [(ngModel)] = "pedido.adelanto">
         </div>
-        <div class="mb-3">
-            <label for="unidades" class="form-label">Unidades</label>
-            <input type="number" class="form-control" id="unidades">
-        </div>
-        <!-- <div class="mb-3 form-check">
+                <!-- <div class="mb-3 form-check">
             <input type="checkbox" class="form-check-input" id="exampleCheck1">
             <label class="form-check-label" for="exampleCheck1">Check me out</label>
         </div> -->
+        <div class="mb-3">
+            <label for="unidades" class="form-label">Unidades</label>
+            <input type="number" class="form-control" id="unidades" name="unidades" [(ngModel)] = "pedido.unidades">
+        </div>
         <div class="text-center" style="margin:30px">
                     <button type="submit" class="btn btn-warning btn-sm me-3">Agregar</button>
         <a href="/" class="btn btn-danger btn-sm">Regresar</a>
