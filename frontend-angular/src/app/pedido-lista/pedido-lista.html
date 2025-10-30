@@ -1,37 +1,34 @@
 <div class="container">
-        <table class="table table-bordered table-striped table-hover align-middle" style="margin:30px">
-            <thead class="table-secondary">
-                <tr>
-                    <th scope="col">Guia</th>
-                    <th scope="col">Destino</th>
-                    <th scope="col">Cliente</th>
-                    <th scope="col">Fecha Admisión</th>
-                    <th scope="col">Estado</th>
-                    <th scope="col">Valor</th>
-                    <th scope="col">Fecha Revisión</th>
-                    <th scope="col">Fecha Archivado</th>
-                    <th scope="col">Adelanto</th>
-                    <th scope="col">Unidades</th>
-                </tr>
-            </thead>
-            <tbody>
-                @for (pedido of pedidos; track pedido.idPedido) {
-                <tr [attr.data-id]="pedido.idPedido">
-                    <td>{{ pedido.numeroGuia }}</td>
-                    <td>{{ pedido.destino }}</td>
-                    <td>{{ pedido.nombreCliente }}</td>
-                    <td>{{ pedido.fechaAdmision }}</td>
-                    <td>{{ pedido.estadoPedido }}</td>
-                    <td>{{ pedido.valor | currency:'$':'symbol':'1.0-0' }}</td>
-                    <td>{{ pedido.fechaRevision }}</td>
-                    <td>{{ pedido.fechaArchivado }}</td>
-                    <td>{{ pedido.adelanto | currency:'$':'symbol':'1.0-0' }}</td>
-                    <td>{{ pedido.unidades }}</td>
-                </tr>
-                
-
-
-                }
-            </tbody>
-        </table>
-    </div>
+    <table class="table table-bordered table-striped table-hover align-middle" style="margin:30px">
+        <thead class="table-secondary">
+            <tr>
+                <th scope="col">Guia</th>
+                <th scope="col">Destino</th>
+                <th scope="col">Cliente</th>
+                <th scope="col">Fecha Admisión</th>
+                <th scope="col">Estado</th>
+                <th scope="col">Valor</th>
+                <th scope="col">Fecha Revisión</th>
+                <th scope="col">Fecha Archivado</th>
+                <th scope="col">Adelanto</th>
+                <th scope="col">Unidades</th>
+            </tr>
+        </thead>
+        <tbody>
+            @for (pedido of pedidos; track pedido.idPedido) {
+            <tr [attr.data-id]="pedido.idPedido">
+                <td>{{ pedido.numeroGuia }}</td>
+                <td>{{ pedido.destino }}</td>
+                <td>{{ pedido.nombreCliente }}</td>
+                <td>{{ pedido.fechaAdmision }}</td>
+                <td>{{ pedido.estadoPedido }}</td>
+                <td>{{ pedido.valor | currency:'$':'symbol':'1.0-0' }}</td>
+                <td>{{ pedido.fechaRevision }}</td>
+                <td>{{ pedido.fechaArchivado }}</td>
+                <td>{{ pedido.adelanto | currency:'$':'symbol':'1.0-0' }}</td>
+                <td>{{ pedido.unidades }}</td>
+            </tr>
+            }
+        </tbody>
+    </table>
+</div>

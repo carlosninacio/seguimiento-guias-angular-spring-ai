@@ -1,9 +1,9 @@
 import { Component, signal } from '@angular/core';
-import { PedidoLista } from "./pedido-lista/pedido-lista";
+import { RouterLink, RouterLinkActive, RouterModule, RouterOutlet } from "@angular/router";
 
 @Component({
   selector: 'app-root',
-  imports: [PedidoLista],
+  imports: [RouterModule,RouterLink, RouterLinkActive, RouterOutlet],
   templateUrl: './app.html'
 })
 export class App {
