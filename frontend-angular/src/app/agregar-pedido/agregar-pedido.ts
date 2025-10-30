@@ -51,7 +51,7 @@ export class AgregarPedido implements OnInit {
 
   ngOnInit() {
     const anioActual = new Date().getFullYear();
-    this.anios = Array.from({ length: 10 }, (_, i) => anioActual - i);
+    this.anios = Array.from({ length: 1 }, (_, i) => anioActual - i);
   }
 
   actualizarFecha(tipo: string) {
