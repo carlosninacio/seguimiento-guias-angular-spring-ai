@@ -7,6 +7,6 @@ public interface IPedidoServicio {
     List<Pedido> listarPedidos();
     Pedido buscarPedidoPorId(Integer idPedido);
     // Pedido buscarPedidoPorGuia(String numeroGuia);
-    void guardarPedido (Pedido pedido);
+    Pedido guardarPedido (Pedido pedido);
     void eliminarPedidoPorId(Integer idPedido);
 }

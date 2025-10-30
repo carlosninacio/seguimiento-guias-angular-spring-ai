@@ -24,7 +24,7 @@ public class PedidoServicio implements IPedidoServicio {
     }
 
     @Override
-    public void guardarPedido(Pedido pedido) {
+    public Pedido guardarPedido(Pedido pedido) {
         pedidoRepositorio.save(pedido);
     }
 
