@@ -4,8 +4,7 @@ import { PedidoLista } from "./pedido-lista/pedido-lista";
 @Component({
   selector: 'app-root',
   imports: [PedidoLista],
-  templateUrl: './app.html',
-  styleUrl: './app.css'
+  templateUrl: './app.html'
 })
 export class App {
   protected readonly title = signal('frontend-angular');
