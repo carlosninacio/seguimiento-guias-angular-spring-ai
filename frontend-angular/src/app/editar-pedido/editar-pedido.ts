@@ -16,7 +16,7 @@ export class EditarPedido {
 
   private pedidoServicio = inject(PedidoService);
   private ruta = inject(ActivatedRoute);
-  private enrutador = inject(Router)
+  private enrutador = inject(Router);
 
   estados = ['VIAJANDO', 'DISTRIBUCIÓN', 'REINTENTO', 'OFICINA', 'ENTREGADO', 'DEVOLUCIÓN', 'ARCHIVADO'];
 
@@ -32,9 +32,7 @@ export class EditarPedido {
   mesArchivado!: number;
   diaArchivado!: number;
 
-
   tieneAdelanto: boolean = false;
-
 
   anios: number[] = [];
   meses = [
@@ -96,24 +94,15 @@ export class EditarPedido {
 
     const s = (valor as string).split('T')[0];
     const parts = s.split('-');
-    const anio = parseInt(parts[0], 10);
-    const mes = parseInt(parts[1], 10);
-    const dia = parseInt(parts[2], 10);
-    return { anio, mes, dia };
+    return {
+      anio: parseInt(parts[0], 10),
+      mes: parseInt(parts[1], 10),
+      dia: parseInt(parts[2], 10)
+    };
   }
 
   crearFecha(anio?: number, mes?: number, dia?: number): Date | null {
-    if (anio && mes && dia) {
-      return new Date(anio, mes - 1, dia);
-    }
-    return null;
-  }
-
-
-  componerFecha(anio?: number, mes?: number, dia?: number): string | null {
-    if (anio && mes && dia) {
-      return `${anio}-${mes.toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`;
-    }
+    if (anio && mes && dia) return new Date(anio, mes - 1, dia);
     return null;
   }
 
@@ -132,9 +121,7 @@ export class EditarPedido {
   }
 
   toggleAdelanto() {
-    if (!this.tieneAdelanto) {
-      this.pedido.adelanto = null; // desactivar campo y limpiar valor
-    }
+    if (!this.tieneAdelanto) this.pedido.adelanto = null;
   }
 
   onSubmit() {
@@ -143,12 +130,21 @@ export class EditarPedido {
 
   guardarPedido() {
     this.pedidoServicio.editarPedido(this.id, this.pedido).subscribe({
-      next: (datos) => this.irPedidoLista(),
+      next: () => this.irPedidoLista(),
       error: (errores) => console.log(errores)
     });
   }
 
   irPedidoLista() {
-    this.enrutador.navigate(['/pedidos'])
+    this.cerrarModal();
+    this.enrutador.navigate(['/pedidos']);
+  }
+
+  cerrarModal() {
+    const modal = document.getElementById('editarPedidoModal');
+    if (modal) modal.style.display = 'none';
+    const backdrop = document.querySelector('.modal-backdrop');
+    if (backdrop) backdrop.remove();
+    this.enrutador.navigate(['/pedidos']);
   }
 }
