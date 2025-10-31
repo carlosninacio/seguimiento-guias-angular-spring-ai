@@ -2,6 +2,7 @@ import { Component, inject } from '@angular/core';
 import { Pedido } from '../pedido';
 import { PedidoService } from '../servicios/pedido';
 import { CurrencyPipe} from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-pedido-lista',
@@ -12,6 +13,7 @@ export class PedidoLista {
   pedidos: Pedido[];
 
   private pedidoServicio = inject(PedidoService);
+  private enrutador = inject(Router);
 
   ngOnInit() {
     // Cargar los pedidos
@@ -29,5 +31,9 @@ export class PedidoLista {
         }
       }
     );
+  }
+
+  editarPedido(id: number) {
+    this.enrutador.navigate(['editar-pedido', id]);
   }
 }

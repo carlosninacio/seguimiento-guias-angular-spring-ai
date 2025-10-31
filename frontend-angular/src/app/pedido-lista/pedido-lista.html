@@ -12,6 +12,7 @@
                 <th scope="col">Fecha Archivado</th>
                 <th scope="col">Adelanto</th>
                 <th scope="col">Unidades</th>
+                <th scope="col" class="text-center">Acciones</th>
             </tr>
         </thead>
         <tbody>
@@ -27,6 +28,11 @@
                 <td>{{ pedido.fechaArchivado }}</td>
                 <td>{{ pedido.adelanto | currency:'$':'symbol':'1.0-0' }}</td>
                 <td>{{ pedido.unidades }}</td>
+                <td class="text-center">
+                    <div>
+                        <button (click)="editarPedido(pedido.idPedido)" class="btn btn-warning btn-sm me-3">Editar</button>
+                    </div>
+                </td>
             </tr>
             }
         </tbody>
