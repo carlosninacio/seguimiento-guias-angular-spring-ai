@@ -45,4 +45,24 @@ public class PedidoControlador {
             throw new RecursoNoEncontradoExcepcion("No se encontró el ID: " + id);
         }
     }
+
+    @PutMapping("/pedidos/{id}")
+    public ResponseEntity<Pedido> actualizarPedido(
+            @PathVariable int id,
+            @RequestBody Pedido pedidoRecibido
+    ){
+        Pedido pedido = pedidoServicio.buscarPedidoPorId(id);
+        pedido.setNumeroGuia(pedidoRecibido.getNumeroGuia());
+        pedido.setDestino(pedidoRecibido.getDestino());
+        pedido.setNombreCliente(pedidoRecibido.getNombreCliente());
+        pedido.setFechaAdmision(pedidoRecibido.getFechaAdmision());
+        pedido.setEstadoPedido(pedidoRecibido.getEstadoPedido());
+        pedido.setValor(pedidoRecibido.getValor());
+        pedido.setFechaRevision(pedidoRecibido.getFechaRevision());
+        pedido.setFechaArchivado(pedidoRecibido.getFechaArchivado());
+        pedido.setAdelanto(pedidoRecibido.getAdelanto());
+        pedido.setUnidades(pedidoRecibido.getUnidades());
+        this.pedidoServicio.guardarPedido(pedido);
+        return ResponseEntity.ok(pedido);
+    }
 }
