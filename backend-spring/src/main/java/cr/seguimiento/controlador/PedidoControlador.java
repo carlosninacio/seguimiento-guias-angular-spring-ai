@@ -1,10 +1,13 @@
 package cr.seguimiento.controlador;
 
+import com.google.cloud.vision.v1.*;
+import com.google.protobuf.ByteString;
 import cr.seguimiento.excepcion.RecursoNoEncontradoExcepcion;
 import cr.seguimiento.modelo.Pedido;
 import cr.seguimiento.servicio.PedidoServicio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,6 +15,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.*;
 
 @RestController
 @RequestMapping("seguimiento-app") // http://localhost:8080/seguimiento-app - Puerto aplicacion por default
@@ -79,4 +87,59 @@ public class PedidoControlador {
         respuesta.put("Eliminado", Boolean.TRUE);
         return ResponseEntity.ok(respuesta);
     }
+    @PostMapping("/pedidos/agregar-pedido")
+    public ResponseEntity<Map<String, Object>> procesarGuia(@RequestParam("file") MultipartFile file) {
+        Map<String, Object> resultado = new HashMap<>();
+
+        try {
+            // Crear archivo temporal
+            File tempFile = File.createTempFile("guia_", file.getOriginalFilename());
+            file.transferTo(tempFile);
+
+            // Extraer texto
+            String textoExtraido = leerTextoConVision(tempFile);
+
+            // Borrar archivo temporal
+            Files.deleteIfExists(tempFile.toPath());
+
+            // Respuesta
+            resultado.put("texto", textoExtraido);
+            resultado.put("exito", true);
+
+            logger.info("Texto extraído de la guía:\n" + textoExtraido);
+
+            return ResponseEntity.ok(resultado);
+
+        } catch (Exception e) {
+            logger.error("Error procesando la guía", e);
+            resultado.put("error", e.getMessage());
+            resultado.put("exito", false);
+            return ResponseEntity.internalServerError().body(resultado);
+        }
+    }
+
+    private String leerTextoConVision(File imagen) throws IOException {
+        List<AnnotateImageRequest> requests = new ArrayList<>();
+        ByteString imgBytes = ByteString.readFrom(Files.newInputStream(imagen.toPath()));
+
+        Image img = Image.newBuilder().setContent(imgBytes).build();
+        Feature feat = Feature.newBuilder().setType(Feature.Type.TEXT_DETECTION).build();
+        AnnotateImageRequest request = AnnotateImageRequest.newBuilder()
+                .addFeatures(feat)
+                .setImage(img)
+                .build();
+        requests.add(request);
+
+        try (ImageAnnotatorClient client = ImageAnnotatorClient.create()) {
+            BatchAnnotateImagesResponse response = client.batchAnnotateImages(requests);
+            AnnotateImageResponse res = response.getResponsesList().get(0);
+
+            if (res.hasError()) {
+                throw new IOException("Error en Vision API: " + res.getError().getMessage());
+            }
+
+            return res.getFullTextAnnotation().getText();
+        }
+    }
+
 }

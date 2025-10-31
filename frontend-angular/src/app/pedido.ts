@@ -5,7 +5,7 @@ export class Pedido {
     nombreCliente: String;
     fechaAdmision: Date | null;
     estadoPedido: string;
-    valor: number;
+    valor: number | null;
     fechaRevision: Date | null;
     fechaArchivado: Date | null;
     adelanto: number | null;

@@ -1,128 +1,153 @@
 <div class="container">
-    <form (ngSubmit)="onSubmit()" autocomplete="off" style="margin: 25px;">
-        <div class="mb-3">
-            <label for="numeroGuia" class="form-label">Número de Guía</label>
-            <input type="text" class="form-control" id="numeroGuia" name="numeroGuia" [(ngModel)]="pedido.numeroGuia"
-                required>
-        </div>
+  <form (ngSubmit)="onSubmit()" autocomplete="off" style="margin: 25px;">
+    
+    <!-- 🔹 Selector de modo -->
+    <div class="mb-3">
+      <label for="modoIngreso" class="form-label">Modo de ingreso</label>
+      <select id="modoIngreso" class="form-select" [(ngModel)]="modoIngreso" name="modoIngreso">
+        <option value="manual">Manual</option>
+        <option value="ia">Rellenar con IA</option>
+      </select>
+    </div>
 
-        <div class="mb-3">
-            <label for="destino" class="form-label">Destino</label>
-            <input type="text" class="form-control" id="destino" name="destino" [(ngModel)]="pedido.destino">
-        </div>
+    <!-- 🔹 Campos del pedido -->
+    <div class="mb-3">
+      <label for="numeroGuia" class="form-label">Número de Guía</label>
+      <input type="text" class="form-control" id="numeroGuia" name="numeroGuia"
+        [(ngModel)]="pedido.numeroGuia" required [readonly]="modoIngreso === 'ia'">
+    </div>
 
-        <div class="mb-3">
-            <label for="nombreCliente" class="form-label">Nombre del Cliente</label>
-            <input type="text" class="form-control" id="nombreCliente" name="nombreCliente"
-                [(ngModel)]="pedido.nombreCliente">
-        </div>
+    <div class="mb-3">
+      <label for="destino" class="form-label">Destino</label>
+      <input type="text" class="form-control" id="destino" name="destino"
+        [(ngModel)]="pedido.destino" [readonly]="modoIngreso === 'ia'">
+    </div>
 
-        <div class="mb-3">
-            <label class="form-label">Fecha de Admisión *</label>
-            <div class="d-flex gap-2">
-                <select class="form-select" [(ngModel)]="anioAdmision" name="anioAdmision"
-                    (change)="actualizarFecha('admision')" required>
-                    <option value="">Año</option>
-                    <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
-                </select>
+    <div class="mb-3">
+      <label for="nombreCliente" class="form-label">Nombre del Cliente</label>
+      <input type="text" class="form-control" id="nombreCliente" name="nombreCliente"
+        [(ngModel)]="pedido.nombreCliente" [readonly]="modoIngreso === 'ia'">
+    </div>
 
-                <select class="form-select" [(ngModel)]="mesAdmision" name="mesAdmision"
-                    (change)="actualizarFecha('admision')" required>
-                    <option value="">Mes</option>
-                    <option *ngFor="let mes of meses" [value]="mes.valor">{{ mes.nombre }}</option>
-                </select>
+    <div class="mb-3">
+      <label class="form-label">Fecha de Admisión *</label>
+      <div class="d-flex gap-2">
+        <select class="form-select" [(ngModel)]="anioAdmision" name="anioAdmision"
+          (change)="actualizarFecha('admision')" required [disabled]="modoIngreso === 'ia'">
+          <option value="">Año</option>
+          <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
+        </select>
 
-                <select class="form-select" [(ngModel)]="diaAdmision" name="diaAdmision"
-                    (change)="actualizarFecha('admision')" required>
-                    <option value="">Día</option>
-                    <option *ngFor="let dia of dias" [value]="dia">{{ dia }}</option>
-                </select>
-            </div>
-        </div>
+        <select class="form-select" [(ngModel)]="mesAdmision" name="mesAdmision"
+          (change)="actualizarFecha('admision')" required [disabled]="modoIngreso === 'ia'">
+          <option value="">Mes</option>
+          <option *ngFor="let mes of meses" [value]="mes.valor">{{ mes.nombre }}</option>
+        </select>
 
-        <div class="mb-3">
-            <label for="estadoPedido" class="form-label">Estado del Pedido</label>
-            <select class="form-select" id="estadoPedido" name="estadoPedido" [(ngModel)]="pedido.estadoPedido">
-                <option value="">Seleccione estado</option>
-                <option *ngFor="let estado of estados" [value]="estado">{{ estado }}</option>
-            </select>
-        </div>
+        <select class="form-select" [(ngModel)]="diaAdmision" name="diaAdmision"
+          (change)="actualizarFecha('admision')" required [disabled]="modoIngreso === 'ia'">
+          <option value="">Día</option>
+          <option *ngFor="let dia of dias" [value]="dia">{{ dia }}</option>
+        </select>
+      </div>
+    </div>
 
-        <div class="mb-3">
-            <label for="valor" class="form-label">Valor</label>
-            <input type="number" class="form-control" id="valor" name="valor" [(ngModel)]="pedido.valor">
-        </div>
+    <div class="mb-3">
+      <label for="estadoPedido" class="form-label">Estado del Pedido</label>
+      <select class="form-select" id="estadoPedido" name="estadoPedido"
+        [(ngModel)]="pedido.estadoPedido" [disabled]="modoIngreso === 'ia'">
+        <option value="">Seleccione estado</option>
+        <option *ngFor="let estado of estados" [value]="estado">{{ estado }}</option>
+      </select>
+    </div>
 
-        <div class="mb-3">
-            <label class="form-label">Fecha de Revisión</label>
-            <div class="d-flex gap-2">
-                <select class="form-select" [(ngModel)]="anioRevision" name="anioRevision"
-                    (change)="actualizarFecha('revision')">
-                    <option value="">Año</option>
-                    <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
-                </select>
+    <div class="mb-3">
+      <label for="valor" class="form-label">Valor</label>
+      <input type="number" class="form-control" id="valor" name="valor"
+        [(ngModel)]="pedido.valor" [readonly]="modoIngreso === 'ia'">
+    </div>
 
-                <select class="form-select" [(ngModel)]="mesRevision" name="mesRevision"
-                    (change)="actualizarFecha('revision')">
-                    <option value="">Mes</option>
-                    <option *ngFor="let mes of meses" [value]="mes.valor">{{ mes.nombre }}</option>
-                </select>
+    <div class="mb-3">
+      <label class="form-label">Fecha de Revisión</label>
+      <div class="d-flex gap-2">
+        <select class="form-select" [(ngModel)]="anioRevision" name="anioRevision"
+          (change)="actualizarFecha('revision')" [disabled]="modoIngreso === 'ia'">
+          <option value="">Año</option>
+          <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
+        </select>
 
-                <select class="form-select" [(ngModel)]="diaRevision" name="diaRevision"
-                    (change)="actualizarFecha('revision')">
-                    <option value="">Día</option>
-                    <option *ngFor="let dia of dias" [value]="dia">{{ dia }}</option>
-                </select>
-            </div>
-        </div>
+        <select class="form-select" [(ngModel)]="mesRevision" name="mesRevision"
+          (change)="actualizarFecha('revision')" [disabled]="modoIngreso === 'ia'">
+          <option value="">Mes</option>
+          <option *ngFor="let mes of meses" [value]="mes.valor">{{ mes.nombre }}</option>
+        </select>
 
-        <div class="mb-3">
-            <label class="form-label">Fecha de Archivado</label>
-            <div class="d-flex gap-2">
-                <select class="form-select" [(ngModel)]="anioArchivado" name="anioArchivado"
-                    (change)="actualizarFecha('archivado')">
-                    <option value="">Año</option>
-                    <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
-                </select>
+        <select class="form-select" [(ngModel)]="diaRevision" name="diaRevision"
+          (change)="actualizarFecha('revision')" [disabled]="modoIngreso === 'ia'">
+          <option value="">Día</option>
+          <option *ngFor="let dia of dias" [value]="dia">{{ dia }}</option>
+        </select>
+      </div>
+    </div>
 
-                <select class="form-select" [(ngModel)]="mesArchivado" name="mesArchivado"
-                    (change)="actualizarFecha('archivado')">
-                    <option value="">Mes</option>
-                    <option *ngFor="let mes of meses" [value]="mes.valor">{{ mes.nombre }}</option>
-                </select>
+    <div class="mb-3">
+      <label class="form-label">Fecha de Archivado</label>
+      <div class="d-flex gap-2">
+        <select class="form-select" [(ngModel)]="anioArchivado" name="anioArchivado"
+          (change)="actualizarFecha('archivado')" [disabled]="modoIngreso === 'ia'">
+          <option value="">Año</option>
+          <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
+        </select>
 
-                <select class="form-select" [(ngModel)]="diaArchivado" name="diaArchivado"
-                    (change)="actualizarFecha('archivado')">
-                    <option value="">Día</option>
-                    <option *ngFor="let dia of dias" [value]="dia">{{ dia }}</option>
-                </select>
-            </div>
-        </div>
+        <select class="form-select" [(ngModel)]="mesArchivado" name="mesArchivado"
+          (change)="actualizarFecha('archivado')" [disabled]="modoIngreso === 'ia'">
+          <option value="">Mes</option>
+          <option *ngFor="let mes of meses" [value]="mes.valor">{{ mes.nombre }}</option>
+        </select>
 
-        <div class="mb-3">
-            <label class="form-label">¿Tiene adelanto?</label>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="tieneAdelanto" [(ngModel)]="tieneAdelanto"
-                    name="tieneAdelanto" (change)="toggleAdelanto()">
-                <label class="form-check-label" for="tieneAdelanto">
-                </label>
-            </div>
+        <select class="form-select" [(ngModel)]="diaArchivado" name="diaArchivado"
+          (change)="actualizarFecha('archivado')" [disabled]="modoIngreso === 'ia'">
+          <option value="">Día</option>
+          <option *ngFor="let dia of dias" [value]="dia">{{ dia }}</option>
+        </select>
+      </div>
+    </div>
 
-            <div class="mt-2" *ngIf="tieneAdelanto">
-                <label for="adelanto" class="form-label">Valor del Adelanto</label>
-                <input type="number" class="form-control" id="adelanto" name="adelanto" [(ngModel)]="pedido.adelanto"
-                    [required]="tieneAdelanto">
-            </div>
-        </div>
+    <div class="mb-3">
+      <label class="form-label">¿Tiene adelanto?</label>
+      <div class="form-check">
+        <input class="form-check-input" type="checkbox" id="tieneAdelanto"
+          [(ngModel)]="tieneAdelanto" name="tieneAdelanto"
+          (change)="toggleAdelanto()" [disabled]="modoIngreso === 'ia'">
+        <label class="form-check-label" for="tieneAdelanto"></label>
+      </div>
 
-        <div class="mb-3">
-            <label for="unidades" class="form-label">Unidades</label>
-            <input type="number" class="form-control" id="unidades" name="unidades" [(ngModel)]="pedido.unidades">
-        </div>
+      <div class="mt-2" *ngIf="tieneAdelanto">
+        <label for="adelanto" class="form-label">Valor del Adelanto</label>
+        <input type="number" class="form-control" id="adelanto" name="adelanto"
+          [(ngModel)]="pedido.adelanto" [required]="tieneAdelanto"
+          [readonly]="modoIngreso === 'ia'">
+      </div>
+    </div>
 
-        <div class="text-center" style="margin:30px">
-            <button type="submit" class="btn btn-warning btn-sm me-3">Agregar</button>
-            <a href="/" class="btn btn-danger btn-sm">Regresar</a>
-        </div>
-    </form>
+    <div class="mb-3">
+      <label for="unidades" class="form-label">Unidades</label>
+      <input type="number" class="form-control" id="unidades" name="unidades"
+        [(ngModel)]="pedido.unidades" [readonly]="modoIngreso === 'ia'">
+    </div>
+
+    <!-- 🔹 Botones -->
+    <div class="text-center" style="margin:30px">
+      <button type="submit" class="btn btn-warning btn-sm me-3"
+        [disabled]="modoIngreso === 'ia' && !pedido.numeroGuia">Agregar</button>
+
+      <!-- 🔹 Botón IA -->
+      <label *ngIf="modoIngreso === 'ia'" class="btn btn-success btn-sm me-3">
+        <i class="bi bi-image"></i> Leer Guía con IA
+        <input type="file" accept="image/*" (change)="subirGuia($event)" hidden>
+      </label>
+
+      <a href="/" class="btn btn-danger btn-sm">Regresar</a>
+    </div>
+  </form>
 </div>
