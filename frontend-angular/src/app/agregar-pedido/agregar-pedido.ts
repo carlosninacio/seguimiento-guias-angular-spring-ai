@@ -18,28 +18,23 @@ export class AgregarPedido implements OnInit {
   private pedidoServicio = inject(PedidoService);
   private enrutador = inject(Router);
 
-  // Dropdown de estados
   estados = ['VIAJANDO', 'DISTRIBUCIÓN', 'REINTENTO', 'OFICINA', 'ENTREGADO', 'DEVOLUCIÓN', 'ARCHIVADO'];
 
-  // Fecha de Admisión
+
   anioAdmision!: number;
   mesAdmision!: number;
   diaAdmision!: number;
 
-  // Fecha de Revisión
   anioRevision!: number;
   mesRevision!: number;
   diaRevision!: number;
 
-  // Fecha de Archivado
   anioArchivado!: number;
   mesArchivado!: number;
   diaArchivado!: number;
 
-  // Control de adelanto
   tieneAdelanto: boolean = false;
 
-  // Listas de opciones para fechas
   anios: number[] = [];
   meses = [
     { nombre: 'Enero', valor: 1 }, { nombre: 'Febrero', valor: 2 }, { nombre: 'Marzo', valor: 3 },
@@ -70,7 +65,6 @@ export class AgregarPedido implements OnInit {
 
   crearFecha(anio?: number, mes?: number, dia?: number): Date | null {
     if (anio && mes && dia) {
-      // mes - 1 porque en JS los meses van de 0 a 11
       return new Date(anio, mes - 1, dia);
     }
     return null;
@@ -80,17 +74,16 @@ export class AgregarPedido implements OnInit {
     if (anio && mes && dia) {
       return `${anio}-${mes.toString().padStart(2, '0')}-${dia.toString().padStart(2, '0')}`;
     }
-    return null; // si no se completa, se devuelve null
+    return null;
   }
 
   toggleAdelanto() {
     if (!this.tieneAdelanto) {
-      this.pedido.adelanto = null; // desactivar campo y limpiar valor
+      this.pedido.adelanto = null;
     }
   }
 
   onSubmit() {
-    // Validar fecha de admisión obligatoria
     if (!this.pedido.fechaAdmision) {
       alert('La fecha de admisión es obligatoria');
       return;
