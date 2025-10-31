@@ -1,10 +1,12 @@
 package cr.seguimiento.controlador;
 
+import cr.seguimiento.excepcion.RecursoNoEncontradoExcepcion;
 import cr.seguimiento.modelo.Pedido;
 import cr.seguimiento.servicio.PedidoServicio;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,5 +34,15 @@ public class PedidoControlador {
     public Pedido agregarPedido(@RequestBody Pedido pedido) {
         logger.info("Pedido a agregar: " + pedido);
         return this.pedidoServicio.guardarPedido(pedido);
+    }
+
+    @GetMapping("/pedidos/{id}")
+    public ResponseEntity<Pedido> obtenerPedidoPorId(@PathVariable int id) {
+        Pedido pedido = this.pedidoServicio.buscarPedidoPorId(id);
+        if(pedido != null) {
+            return ResponseEntity.ok(pedido);
+        } else {
+            throw new RecursoNoEncontradoExcepcion("No se encontró el ID: " + id);
+        }
     }
 }
