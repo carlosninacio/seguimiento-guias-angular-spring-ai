@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("seguimiento-app") // http://localhost:8080/seguimiento-app - Puerto aplicacion por default
@@ -64,5 +66,17 @@ public class PedidoControlador {
         pedido.setUnidades(pedidoRecibido.getUnidades());
         this.pedidoServicio.guardarPedido(pedido);
         return ResponseEntity.ok(pedido);
+    }
+
+    @DeleteMapping("/pedidos/{id}")
+    public ResponseEntity<Map<String, Boolean>> eliminarProducto(@PathVariable int id) {
+        Pedido pedido = this.pedidoServicio.buscarPedidoPorId(id);
+        if(pedido == null){
+            throw new RecursoNoEncontradoExcepcion("No se encontró el id: " + id);
+        }
+        this.pedidoServicio.eliminarPedidoPorId(pedido.getIdPedido());
+        Map<String, Boolean> respuesta = new HashMap<>();
+        respuesta.put("Eliminado", Boolean.TRUE);
+        return ResponseEntity.ok(respuesta);
     }
 }

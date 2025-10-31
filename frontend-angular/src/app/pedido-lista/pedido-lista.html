@@ -30,7 +30,22 @@
                 <td>{{ pedido.unidades }}</td>
                 <td class="text-center">
                     <div>
-                        <button (click)="editarPedido(pedido.idPedido)" class="btn btn-warning btn-sm me-3">Editar</button>
+                        <button
+  (click)="editarPedido(pedido.idPedido)"
+  class="btn btn-warning btn-sm me-2 d-inline-flex align-items-center"
+  title="Editar"
+>
+  <i class="bi bi-pencil"></i>
+</button>
+
+<button
+  (click)="eliminarPedido(pedido.idPedido)"
+  class="btn btn-danger btn-sm d-inline-flex align-items-center"
+  title="Eliminar"
+>
+  <i class="bi bi-trash"></i>
+</button>
+
                     </div>
                 </td>
             </tr>

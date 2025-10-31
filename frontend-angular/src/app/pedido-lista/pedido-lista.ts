@@ -36,4 +36,11 @@ export class PedidoLista {
   editarPedido(id: number) {
     this.enrutador.navigate(['editar-pedido', id]);
   }
+
+  eliminarPedido(id: number) {
+    this.pedidoServicio.eliminarPedido(id).subscribe({
+              next: (datos) => this.obtenerPedidos(),
+              error: (errores) => console.log(errores)
+    })
+  }
 }

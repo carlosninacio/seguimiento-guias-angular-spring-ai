@@ -25,4 +25,9 @@ export class PedidoService {
   editarPedido(id:number, pedido:Pedido) {
     return this.clienteHttp.put(`${this.urlBase}/${id}`, pedido);
   }
+
+  eliminarPedido(id: number): Observable<Object> {
+    return this.clienteHttp.delete(`${this.urlBase}/${id}`);
+  }
+
 }
