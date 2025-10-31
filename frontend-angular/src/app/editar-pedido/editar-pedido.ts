@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { Pedido } from '../pedido';
 import { PedidoService } from '../servicios/pedido';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -16,6 +16,7 @@ export class EditarPedido {
 
   private pedidoServicio = inject(PedidoService);
   private ruta = inject(ActivatedRoute);
+  private enrutador = inject(Router)
 
   estados = ['VIAJANDO', 'DISTRIBUCIÓN', 'REINTENTO', 'OFICINA', 'ENTREGADO', 'DEVOLUCIÓN', 'ARCHIVADO'];
 
@@ -137,6 +138,17 @@ export class EditarPedido {
   }
 
   onSubmit() {
-    // editar producto
+    this.guardarPedido();
+  }
+
+  guardarPedido() {
+    this.pedidoServicio.editarPedido(this.id, this.pedido).subscribe({
+      next: (datos) => this.irPedidoLista(),
+      error: (errores) => console.log(errores)
+    });
+  }
+
+  irPedidoLista() {
+    this.enrutador.navigate(['/pedidos'])
   }
 }
