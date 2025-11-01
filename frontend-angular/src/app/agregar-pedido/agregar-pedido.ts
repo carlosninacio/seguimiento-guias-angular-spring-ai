@@ -48,6 +48,8 @@ export class AgregarPedido implements OnInit {
   ];
   dias: number[] = Array.from({ length: 31 }, (_, i) => i + 1);
 
+  cargandoIA: boolean = false; // 🔹 Feedback visual de carga
+
   ngOnInit() {
     const anioActual = new Date().getFullYear();
     this.anios = [anioActual];
@@ -111,36 +113,50 @@ export class AgregarPedido implements OnInit {
     const formData = new FormData();
     formData.append('file', file);
 
+    this.cargandoIA = true; // 🔹 Inicia animación de carga
+
     this.http.post<any>('http://localhost:8080/seguimiento-app/pedidos/agregar-pedido', formData)
       .subscribe({
         next: (resp) => {
-          if (resp.exito && resp.texto) {
-            const texto = resp.texto;
+          this.cargandoIA = false; // 🔹 Detiene carga
 
-            // Extraer datos con expresiones regulares
-            this.pedido.numeroGuia = this.extraerNumeroGuia(texto);
-            this.pedido.nombreCliente = this.extraerNombreCliente(texto);
-            this.pedido.destino = this.extraerDestino(texto);
-            this.pedido.valor = this.extraerValor(texto);
+          if (resp && resp.exito) {
 
-            alert('Datos de la guía cargados correctamente ✅');
+            // Número de guía
+            if (resp.numeroGuia) this.pedido.numeroGuia = resp.numeroGuia;
+
+            // Nombre del cliente (primer renglón del bloque "PARA:")
+            if (resp.nombreCliente) this.pedido.nombreCliente = resp.nombreCliente;
+
+            // Destino (último renglón del bloque "PARA:")
+            if (resp.destino) this.pedido.destino = resp.destino;
+
+            // Valor
+            if (resp.valor !== undefined && resp.valor !== null) {
+              const v = Number(resp.valor);
+              this.pedido.valor = Number.isNaN(v) ? null : v;
+            }
+
+            alert('✅ Datos de la guía cargados. Puedes editarlos antes de guardar.');
+
           } else {
-            alert('No se pudo leer la guía o la IA no encontró texto.');
+            console.warn('OCR no encontró datos útiles', resp);
+            alert('⚠️ No se pudo leer la guía o no se detectaron datos claros.');
           }
 
-          // 🔹 Limpieza del input de archivo
           event.target.value = '';
         },
         error: (err) => {
+          this.cargandoIA = false;
           console.error(err);
-          alert('Error al procesar la imagen.');
+          alert('❌ Error al procesar la imagen.');
           event.target.value = '';
         }
       });
   }
 
   // ======================
-  // 🔍 Métodos de extracción con regex
+  // 🔍 Métodos regex (respaldo)
   // ======================
   private extraerNumeroGuia(texto: string): string {
     const match = texto.match(/gu[ií]a\s*(\d{6,})/i);
