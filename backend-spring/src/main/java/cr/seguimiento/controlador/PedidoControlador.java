@@ -11,7 +11,24 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.*;
+
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.List;
+
+import cr.seguimiento.modelo.Pedido;
+import cr.seguimiento.servicio.PedidoServicio;
 
 @RestController
 @RequestMapping("/seguimiento-app/pedidos") // ✅ Ajuste clave para coincidir con el front
@@ -110,4 +127,45 @@ public class PedidoControlador {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(respuesta);
         }
     }
+
+    @GetMapping("/api/pedidos/excel")
+    public ResponseEntity<byte[]> exportarPedidosAExcel() throws IOException {
+        List<Pedido> pedidos = pedidoServicio.listarPedidos();
+
+        Workbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("Pedidos");
+
+        Row header = sheet.createRow(0);
+        String[] columnas = { "Guía", "Destino", "Cliente", "Fecha Admisión", "Estado", "Valor", "Fecha Revisión", "Fecha Archivado", "Adelanto", "Unidades" };
+
+        for (int i = 0; i < columnas.length; i++) {
+            Cell cell = header.createCell(i);
+            cell.setCellValue(columnas[i]);
+        }
+
+        int fila = 1;
+        for (Pedido pedido : pedidos) {
+            Row row = sheet.createRow(fila++);
+            row.createCell(0).setCellValue(pedido.getNumeroGuia());
+            row.createCell(1).setCellValue(pedido.getDestino());
+            row.createCell(2).setCellValue(pedido.getNombreCliente());
+            row.createCell(3).setCellValue(String.valueOf(pedido.getFechaAdmision()));
+            row.createCell(4).setCellValue(pedido.getEstadoPedido());
+            row.createCell(5).setCellValue(pedido.getValor());
+            row.createCell(6).setCellValue(String.valueOf(pedido.getFechaRevision()));
+            row.createCell(7).setCellValue(String.valueOf(pedido.getFechaArchivado()));
+            row.createCell(8).setCellValue(pedido.getAdelanto());
+            row.createCell(9).setCellValue(pedido.getUnidades());
+        }
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        workbook.close();
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=pedidos.xlsx")
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(outputStream.toByteArray());
+    }
+
 }
