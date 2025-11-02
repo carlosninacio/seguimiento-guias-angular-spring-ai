@@ -75,12 +75,15 @@
               "zone.js/testing"
             ],
             "tsConfig": "tsconfig.spec.json",
-            "assets": [
-              {
-                "glob": "**/*",
-                "input": "public"
-              }
-            ],
+           "assets": [
+  "src/favicon.ico",
+  {
+    "glob": "**/*",
+    "input": "public",
+    "output": "assets"
+  }
+]
+,
             "styles": [
               "src/styles.css"
             ]

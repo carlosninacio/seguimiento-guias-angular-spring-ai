@@ -1,5 +1,5 @@
 <div class="container-fluid">
-  <table class="table table-striped table-hover align-middle table-sm w-100 text-nowrap small">
+  <table class="table table-striped table-hover align-middle table-sm w-100 text-nowrap">
     <thead class="table-primary">
       <tr>
         <th scope="col">Guía</th>
@@ -43,11 +43,28 @@
     </tbody>
   </table>
 
-  <!-- Footer SOLO en esta página -->
-  <footer class="border-top pt-3 mt-4 d-flex justify-content-end">
-    <button (click)="exportarExcel()" class="btn btn-success btn-lg d-inline-flex align-items-center" title="Exportar pedidos a Excel">
-      <i class="bi bi-file-earmark-excel me-2"></i>
-      Exportar a Excel
-    </button>
-  </footer>
+<!-- Footer SOLO en esta página -->
+<footer class="border-top pt-3 mt-4 d-flex justify-content-between align-items-center flex-wrap">
+  <!-- Logos de transportadoras -->
+  <div class="d-flex align-items-center gap-4">
+    <a href="https://www3.interrapidisimo.com/SitioLogin/auth/login" 
+       target="_blank" rel="noopener"
+       class="transportadora-logo p-2 rounded shadow-sm bg-white d-flex align-items-center justify-content-center">
+      <img src="/interrapidisimo.png" alt="Interrapidísimo" style="height:40px; object-fit:contain;">
+    </a>
+    <a href="https://apps.servientrega.com/SismilenioNET/Ingreso.aspx" 
+       target="_blank" rel="noopener"
+       class="transportadora-logo p-2 rounded shadow-sm bg-white d-flex align-items-center justify-content-center">
+      <img src="/servientrega.png" alt="Servientrega" style="height:40px; object-fit:contain;">
+    </a>
+  </div>
+
+  <!-- Botón Excel -->
+  <button (click)="exportarExcel()" 
+          class="btn btn-success btn-lg d-flex align-items-center shadow-sm px-4 mt-3 mt-md-0"
+          title="Exportar pedidos a Excel">
+    <i class="bi bi-file-earmark-excel me-2"></i>
+    Exportar a Excel
+  </button>
+</footer>
 </div>
