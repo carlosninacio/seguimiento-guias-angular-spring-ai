@@ -14,11 +14,22 @@
       </select>
     </div>
 
-    <!-- 🔹 Indicador de carga IA -->
-    <div *ngIf="cargandoIA" class="alert alert-info text-center py-2">
-      <div class="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
-      Procesando imagen con IA... por favor espera.
-    </div>
+   <!-- 🔹 Feedback visual -->
+<div *ngIf="mensajeIA" class="alert mt-3"
+     [ngClass]="{
+       'alert-success': tipoMensajeIA === 'success',
+       'alert-danger': tipoMensajeIA === 'error'
+     }" role="alert">
+  {{ mensajeIA }}
+</div>
+
+<!-- 🔹 Spinner mientras procesa -->
+<div *ngIf="procesandoIA" class="text-center my-3">
+  <div class="spinner-border text-success" role="status">
+    <span class="visually-hidden">Procesando...</span>
+  </div>
+  <p class="mt-2 text-muted">Analizando la guía con IA...</p>
+</div>
 
     <!-- 🔹 Campos del pedido -->
     <div class="row">

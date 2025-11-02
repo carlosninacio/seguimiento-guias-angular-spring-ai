@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -111,6 +112,73 @@ public class PedidoServicio {
         return "";
     }
 
+    // ✅ Extraer destino (ej: "CALI / VALLE DEL CAUCA")
+    public String extraerDestino(String texto) {
+        if (texto == null) return "";
 
+        String[] lines = texto.split("\\r?\\n");
+        int paraIdx = -1;
+        for (int i = 0; i < lines.length; i++) {
+            String l = lines[i];
+            if (l == null) continue;
+            String up = l.toUpperCase();
+            if (up.contains("PARA")) { // "PARA:" o "PARA"
+                paraIdx = i;
+                break;
+            }
+        }
+
+        String candidate = "";
+        // 1) Buscar dentro del bloque PARA: (siguientes 8 líneas)
+        if (paraIdx != -1) {
+            for (int i = paraIdx + 1; i < Math.min(lines.length, paraIdx + 9); i++) {
+                String line = (lines[i] == null) ? "" : lines[i].trim();
+                if (line.isEmpty()) continue;
+
+                String up = line.toUpperCase(Locale.ROOT);
+
+                // Saltar líneas que no son el destino
+                if (up.startsWith("COD") || up.contains("COD.POSTAL") || up.contains("BOLSA")
+                        || up.contains("PESO") || up.startsWith("OBS")) {
+                    continue;
+                }
+                // Saltar direcciones con muchos dígitos
+                if (up.matches(".*\\d.*")) {
+                    continue;
+                }
+
+                // Candidatos: línea toda en mayúsculas o con "/"
+                if (up.contains("/") || up.matches("^[A-ZÁÉÍÓÚÜÑ\\s\\-]{4,}$")) {
+                    candidate = up; // nos quedamos con la MÁS RECIENTE (suele ser la última del bloque)
+                }
+            }
+        }
+
+        // 2) Respaldo: buscar en todo el texto "CIUDAD / DEPARTAMENTO"
+        if (candidate.isEmpty()) {
+            Pattern p = Pattern.compile("([A-ZÁÉÍÓÚÜÑ]+(?:\\s+[A-ZÁÉÍÓÚÜÑ]+)*\\s*/\\s*[A-ZÁÉÍÓÚÜÑ]+(?:\\s+[A-ZÁÉÍÓÚÜÑ]+)*)");
+            Matcher m = p.matcher(texto.toUpperCase(Locale.ROOT));
+            String last = "";
+            while (m.find()) last = m.group(1);
+            candidate = last;
+        }
+
+        return normalizarDestino(candidate);
+    }
+
+    private String normalizarDestino(String s) {
+        if (s == null) return "";
+        // Quitar basurita de OCR pero conservar acentos, guiones y "/"
+        s = s.replaceAll("[^A-ZÁÉÍÓÚÜÑ/\\s\\-]", "");
+        // Normalizar separador
+        s = s.replaceAll("\\s*/\\s*", " / ");
+        // Compactar espacios
+        s = s.replaceAll("\\s{2,}", " ").trim();
+
+        // Algunos OCR juntan el slash con letras: "CALI/VALLE"
+        s = s.replaceAll("([A-ZÁÉÍÓÚÜÑ])/(\\s*[A-ZÁÉÍÓÚÜÑ])", "$1 / $2");
+
+        return s;
+    }
 
 }

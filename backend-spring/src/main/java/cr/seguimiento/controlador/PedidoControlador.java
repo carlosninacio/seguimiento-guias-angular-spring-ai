@@ -118,7 +118,7 @@ public class PedidoControlador {
             respuesta.put("numeroGuia", pedidoServicio.extraerNumeroGuia(texto));
             respuesta.put("valor", pedidoServicio.extraerValor(texto));
             respuesta.put("nombreCliente", pedidoServicio.extraerNombreDestinatario(texto));
-
+            respuesta.put("destino", pedidoServicio.extraerDestino(texto));
 
             return ResponseEntity.ok(respuesta);
         } catch (Exception e) {

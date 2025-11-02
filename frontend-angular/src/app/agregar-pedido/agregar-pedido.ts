@@ -50,6 +50,21 @@ export class AgregarPedido implements OnInit {
 
   cargandoIA: boolean = false; // 🔹 Feedback visual de carga
 
+  mensajeIA: string = "";
+tipoMensajeIA: "success" | "error" | "" = "";
+procesandoIA: boolean = false;
+
+mostrarMensaje(tipo: "success" | "error", texto: string) {
+  this.tipoMensajeIA = tipo;
+  this.mensajeIA = texto;
+
+  // Ocultar mensaje después de 4 segundos
+  setTimeout(() => {
+    this.mensajeIA = "";
+    this.tipoMensajeIA = "";
+  }, 4000);
+}
+
   ngOnInit() {
     const anioActual = new Date().getFullYear();
     this.anios = [anioActual];
@@ -106,55 +121,51 @@ export class AgregarPedido implements OnInit {
   // ======================
   // 🤖 Lógica para modo IA
   // ======================
-  subirGuia(event: any) {
-    const file = event.target.files[0];
-    if (!file) return;
+ subirGuia(event: any) {
+  const file = event.target.files[0];
+  if (!file) return;
 
-    const formData = new FormData();
-    formData.append('file', file);
+  const formData = new FormData();
+  formData.append('file', file);
 
-    this.cargandoIA = true; // 🔹 Inicia animación de carga
+  this.procesandoIA = true;
+  this.mostrarMensaje("success", "Procesando la imagen, por favor espera...");
 
-    this.http.post<any>('http://localhost:8080/seguimiento-app/pedidos/agregar-pedido', formData)
-      .subscribe({
-        next: (resp) => {
-          this.cargandoIA = false; // 🔹 Detiene carga
+  this.http.post<any>('http://localhost:8080/seguimiento-app/pedidos/agregar-pedido', formData)
+    .subscribe({
+      next: (resp) => {
+        this.procesandoIA = false;
 
-          if (resp && resp.exito) {
+        if (resp && resp.exito) {
+          // Rellenar campos
+          if (resp.numeroGuia) this.pedido.numeroGuia = resp.numeroGuia;
+          if (resp.nombreCliente) this.pedido.nombreCliente = resp.nombreCliente;
+          if (resp.destino) this.pedido.destino = resp.destino;
 
-            // Número de guía
-            if (resp.numeroGuia) this.pedido.numeroGuia = resp.numeroGuia;
-
-            // Nombre del cliente (primer renglón del bloque "PARA:")
-            if (resp.nombreCliente) this.pedido.nombreCliente = resp.nombreCliente;
-
-            // Destino (último renglón del bloque "PARA:")
-            if (resp.destino) this.pedido.destino = resp.destino;
-
-            // Valor
-            if (resp.valor !== undefined && resp.valor !== null) {
-              const v = Number(resp.valor);
-              this.pedido.valor = Number.isNaN(v) ? null : v;
-            }
-
-            alert('✅ Datos de la guía cargados. Puedes editarlos antes de guardar.');
-
-          } else {
-            console.warn('OCR no encontró datos útiles', resp);
-            alert('⚠️ No se pudo leer la guía o no se detectaron datos claros.');
+          if (resp.valor !== undefined && resp.valor !== null) {
+            const v = Number(resp.valor);
+            this.pedido.valor = Number.isNaN(v) ? null : v;
           }
 
-          event.target.value = '';
-        },
-        error: (err) => {
-          this.cargandoIA = false;
-          console.error(err);
-          alert('❌ Error al procesar la imagen.');
-          event.target.value = '';
-        }
-      });
-  }
+          if (resp.fechaAdmision) {
+            this.setFechaAdmisionFromString(resp.fechaAdmision);
+          }
 
+          this.mostrarMensaje("success", "✅ Datos de la guía cargados correctamente");
+        } else {
+          this.mostrarMensaje("error", "⚠️ No se pudo leer la guía o no se detectaron datos claros.");
+        }
+
+        event.target.value = '';
+      },
+      error: (err) => {
+        this.procesandoIA = false;
+        console.error(err);
+        this.mostrarMensaje("error", "❌ Error al procesar la imagen. Intenta nuevamente.");
+        event.target.value = '';
+      }
+    });
+}
   // ======================
   // 🔍 Métodos regex (respaldo)
   // ======================
@@ -177,4 +188,43 @@ export class AgregarPedido implements OnInit {
     const match = texto.match(/valor[:\s]*\$?([\d.,]+)/i);
     return match ? parseFloat(match[1].replace(/[.,]/g, '')) : null;
   }
+
+  // ✅ Recibe "01/11/2025 10:45" o "01-11-2025" y rellena los selects (Año, Mes, Día)
+private setFechaAdmisionFromString(fechaStr: string) {
+  if (!fechaStr) return;
+
+  // Tomar solo la parte de fecha (antes del espacio por si trae hora)
+  const soloFecha = fechaStr.trim().split(/\s+/)[0];
+
+  // Acepta dd/MM/yyyy, dd-MM-yyyy, MM/dd/yyyy, MM-dd-yyyy
+  const m = soloFecha.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+  if (!m) return;
+
+  let a = parseInt(m[3], 10);
+  let b = parseInt(m[2], 10);
+  let c = parseInt(m[1], 10);
+
+  // Asumimos formato LATAM por defecto: dd/MM/yyyy
+  // Si parece MM/dd/yyyy (primer número <=12 y el segundo >12), lo intercambiamos.
+  let dia = c, mes = b, anio = a;
+  if (c <= 12 && b > 12) {
+    dia = b;
+    mes = c;
+  }
+
+  // Normaliza año de 2 dígitos
+  if (anio < 100) anio += 2000;
+
+  // Validación básica
+  if (mes < 1 || mes > 12 || dia < 1 || dia > 31) return;
+
+  this.anioAdmision = anio;
+  this.mesAdmision = mes;      // tu dropdown usa valores 1..12
+  this.diaAdmision = dia;
+
+  // Actualiza el modelo pedido.fechaAdmision
+  this.actualizarFecha('admision');
+}
+
+
 }
