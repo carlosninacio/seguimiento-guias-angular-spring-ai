@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Pedido } from '../pedido';
@@ -30,4 +30,14 @@ export class PedidoService {
     return this.clienteHttp.delete(`${this.urlBase}/${id}`);
   }
 
+  descargarExcel(): Observable<Blob> {
+    const headers = new HttpHeaders({
+      'Accept': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    });
+
+    return this.clienteHttp.get(`${this.urlBase}/excel`, {
+      headers,
+      responseType: 'blob'
+    });
+  }
 }

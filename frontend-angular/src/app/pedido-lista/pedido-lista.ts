@@ -43,4 +43,20 @@ export class PedidoLista {
               error: (errores) => console.log(errores)
     })
   }
+  
+exportarExcel(): void {
+    this.pedidoServicio.descargarExcel().subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'pedidos.xlsx';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+      },
+      error: (e) => console.error('Error descargando Excel', e)
+    });
+  }
 }

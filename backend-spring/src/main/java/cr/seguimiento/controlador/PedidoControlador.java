@@ -128,44 +128,55 @@ public class PedidoControlador {
         }
     }
 
-    @GetMapping("/api/pedidos/excel")
+    @GetMapping("/excel")
     public ResponseEntity<byte[]> exportarPedidosAExcel() throws IOException {
         List<Pedido> pedidos = pedidoServicio.listarPedidos();
 
-        Workbook workbook = new XSSFWorkbook();
-        Sheet sheet = workbook.createSheet("Pedidos");
+        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
+            Sheet sheet = workbook.createSheet("Pedidos");
 
-        Row header = sheet.createRow(0);
-        String[] columnas = { "Guía", "Destino", "Cliente", "Fecha Admisión", "Estado", "Valor", "Fecha Revisión", "Fecha Archivado", "Adelanto", "Unidades" };
+            // Encabezados
+            String[] columnas = { "Guía", "Destino", "Cliente", "Fecha Admisión", "Estado", "Valor",
+                    "Fecha Revisión", "Fecha Archivado", "Adelanto", "Unidades" };
 
-        for (int i = 0; i < columnas.length; i++) {
-            Cell cell = header.createCell(i);
-            cell.setCellValue(columnas[i]);
+            Row header = sheet.createRow(0);
+            for (int i = 0; i < columnas.length; i++) {
+                Cell cell = header.createCell(i);
+                cell.setCellValue(columnas[i]);
+            }
+
+            // Datos
+            int fila = 1;
+            for (Pedido p : pedidos) {
+                Row row = sheet.createRow(fila++);
+                row.createCell(0).setCellValue(p.getNumeroGuia() != null ? p.getNumeroGuia() : "");
+                row.createCell(1).setCellValue(p.getDestino() != null ? p.getDestino() : "");
+                row.createCell(2).setCellValue(p.getNombreCliente() != null ? p.getNombreCliente() : "");
+                row.createCell(3).setCellValue(p.getFechaAdmision() != null ? p.getFechaAdmision().toString() : "");
+                row.createCell(4).setCellValue(p.getEstadoPedido() != null ? p.getEstadoPedido() : "");
+                row.createCell(5).setCellValue(p.getValor() != null ? p.getValor() : 0);
+                row.createCell(6).setCellValue(p.getFechaRevision() != null ? p.getFechaRevision().toString() : "");
+                row.createCell(7).setCellValue(p.getFechaArchivado() != null ? p.getFechaArchivado().toString() : "");
+                row.createCell(8).setCellValue(p.getAdelanto() != null ? p.getAdelanto() : 0);
+                row.createCell(9).setCellValue(p.getUnidades() != null ? p.getUnidades() : 0);
+            }
+
+            // Auto-size
+            for (int i = 0; i < columnas.length; i++) {
+                sheet.autoSizeColumn(i);
+            }
+
+            workbook.write(bos);
+            byte[] bytes = bos.toByteArray();
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=pedidos.xlsx");
+            headers.setContentLength(bytes.length);
+
+            return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
         }
-
-        int fila = 1;
-        for (Pedido pedido : pedidos) {
-            Row row = sheet.createRow(fila++);
-            row.createCell(0).setCellValue(pedido.getNumeroGuia());
-            row.createCell(1).setCellValue(pedido.getDestino());
-            row.createCell(2).setCellValue(pedido.getNombreCliente());
-            row.createCell(3).setCellValue(String.valueOf(pedido.getFechaAdmision()));
-            row.createCell(4).setCellValue(pedido.getEstadoPedido());
-            row.createCell(5).setCellValue(pedido.getValor());
-            row.createCell(6).setCellValue(String.valueOf(pedido.getFechaRevision()));
-            row.createCell(7).setCellValue(String.valueOf(pedido.getFechaArchivado()));
-            row.createCell(8).setCellValue(pedido.getAdelanto());
-            row.createCell(9).setCellValue(pedido.getUnidades());
-        }
-
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        workbook.write(outputStream);
-        workbook.close();
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=pedidos.xlsx")
-                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-                .body(outputStream.toByteArray());
     }
 
 }
