@@ -179,4 +179,69 @@ public class PedidoControlador {
         }
     }
 
+    @PostMapping("/crear-rotulos")
+    public ResponseEntity<byte[]> generarWordRotulos(
+            @RequestBody java.util.List<java.util.Map<String,Object>> rotulos
+    ) throws java.io.IOException {
+
+        org.apache.poi.xwpf.usermodel.XWPFDocument doc = new org.apache.poi.xwpf.usermodel.XWPFDocument();
+
+        int cols = 3;
+        int rows = (int) Math.ceil(rotulos.size() / (double) cols);
+        var table = doc.createTable(rows, cols);
+
+        table.setInsideHBorder(org.apache.poi.xwpf.usermodel.XWPFTable.XWPFBorderType.SINGLE, 4, 0, "000000");
+        table.setInsideVBorder(org.apache.poi.xwpf.usermodel.XWPFTable.XWPFBorderType.SINGLE, 4, 0, "000000");
+        table.setTableAlignment(org.apache.poi.xwpf.usermodel.TableRowAlign.CENTER);
+
+        int idx = 0;
+        for (int i = 0; i < rows; i++) {
+            var r = table.getRow(i);
+            for (int j = 0; j < cols; j++) {
+                var cell = r.getCell(j);
+                cell.removeParagraph(0);
+
+                // párrafo nuevo
+                var p = cell.addParagraph();
+                p.setSpacingAfter(100); // espacio entre rótulos opcional
+
+                var run = p.createRun();
+                run.setFontFamily("Calibri");
+                run.setFontSize(9);
+
+                if (idx < rotulos.size()) {
+                    var m = rotulos.get(idx++);
+
+                    // ✅ Saltos de línea reales:
+                    run.setText(s(m.get("nombre")));
+                    run.addBreak();
+                    run.setText(s(m.get("numero")));
+                    run.addBreak();
+                    run.setText(s(m.get("detalle")));
+                    run.addBreak();
+                    run.setText(s(m.get("iniciales")));
+                    run.addBreak();
+                    run.setText(s(m.get("repartidora")));
+                } else {
+                    run.setText("");
+                }
+
+                cell.setVerticalAlignment(org.apache.poi.xwpf.usermodel.XWPFTableCell.XWPFVertAlign.CENTER);
+            }
+        }
+
+        var out = new java.io.ByteArrayOutputStream();
+        doc.write(out);
+        doc.close();
+
+        return org.springframework.http.ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=rotulos.docx")
+                .contentType(org.springframework.http.MediaType.parseMediaType(
+                        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"))
+                .body(out.toByteArray());
+    }
+
+    private String s(Object o) {
+        return o == null ? "" : String.valueOf(o);
+    }
 }
