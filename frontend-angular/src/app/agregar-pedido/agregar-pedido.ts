@@ -5,6 +5,7 @@ import { PedidoService } from '../servicios/pedido';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-agregar-pedido',
@@ -48,22 +49,20 @@ export class AgregarPedido implements OnInit {
   ];
   dias: number[] = Array.from({ length: 31 }, (_, i) => i + 1);
 
-  cargandoIA: boolean = false; // 🔹 Feedback visual de carga
-
+  // 🔹 Feedback/estado IA
+  cargandoIA: boolean = false;
   mensajeIA: string = "";
-tipoMensajeIA: "success" | "error" | "" = "";
-procesandoIA: boolean = false;
+  tipoMensajeIA: "success" | "error" | "" = "";
+  procesandoIA: boolean = false;
 
-mostrarMensaje(tipo: "success" | "error", texto: string) {
-  this.tipoMensajeIA = tipo;
-  this.mensajeIA = texto;
-
-  // Ocultar mensaje después de 4 segundos
-  setTimeout(() => {
-    this.mensajeIA = "";
-    this.tipoMensajeIA = "";
-  }, 4000);
-}
+  mostrarMensaje(tipo: "success" | "error", texto: string) {
+    this.tipoMensajeIA = tipo;
+    this.mensajeIA = texto;
+    setTimeout(() => {
+      this.mensajeIA = "";
+      this.tipoMensajeIA = "";
+    }, 4000);
+  }
 
   ngOnInit() {
     const anioActual = new Date().getFullYear();
@@ -119,53 +118,110 @@ mostrarMensaje(tipo: "success" | "error", texto: string) {
   }
 
   // ======================
-  // 🤖 Lógica para modo IA
+  // 🤖 Lógica mejorada para modo IA
   // ======================
- subirGuia(event: any) {
-  const file = event.target.files[0];
-  if (!file) return;
+  async subirGuia(event: Event) {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
 
-  const formData = new FormData();
-  formData.append('file', file);
+    // ✅ valida tipo de archivo
+    if (!/^image\//.test(file.type)) {
+      this.mostrarMensaje("error", "El archivo debe ser una imagen.");
+      input.value = '';
+      return;
+    }
 
-  this.procesandoIA = true;
-  this.mostrarMensaje("success", "Procesando la imagen, por favor espera...");
+    try {
+      this.procesandoIA = true;
+      this.mostrarMensaje("success", "Procesando la imagen, por favor espera...");
 
-  this.http.post<any>('http://localhost:8080/seguimiento-app/pedidos/agregar-pedido', formData)
-    .subscribe({
-      next: (resp) => {
-        this.procesandoIA = false;
+      // ⬇️ Comprime antes de subir (reduce tamaño x5–x10)
+      const blob = await this.compressImage(file, 1600, 0.72); // ancho máx 1600px, calidad 72%
+      const formData = new FormData();
+      formData.append('file', new File([blob], file.name.replace(/\.\w+$/, '.jpg'), { type: 'image/jpeg' }));
 
-        if (resp && resp.exito) {
-          // Rellenar campos
-          if (resp.numeroGuia) this.pedido.numeroGuia = resp.numeroGuia;
-          if (resp.nombreCliente) this.pedido.nombreCliente = resp.nombreCliente;
-          if (resp.destino) this.pedido.destino = resp.destino;
+      this.http.post<any>('http://localhost:8080/seguimiento-app/pedidos/agregar-pedido', formData)
+        .pipe(finalize(() => {
+          this.procesandoIA = false;
+          input.value = ''; // reset input
+        }))
+        .subscribe({
+          next: (resp) => {
+            if (resp && resp.exito) {
+              if (resp.numeroGuia) this.pedido.numeroGuia = resp.numeroGuia;
+              if (resp.nombreCliente) this.pedido.nombreCliente = resp.nombreCliente;
+              if (resp.destino) this.pedido.destino = resp.destino;
 
-          if (resp.valor !== undefined && resp.valor !== null) {
-            const v = Number(resp.valor);
-            this.pedido.valor = Number.isNaN(v) ? null : v;
+              if (resp.valor !== undefined && resp.valor !== null) {
+                const v = Number(resp.valor);
+                this.pedido.valor = Number.isNaN(v) ? null : v;
+              }
+
+              if (resp.fechaAdmision) this.setFechaAdmisionFromString(resp.fechaAdmision);
+
+              this.mostrarMensaje("success", "✅ Datos de la guía cargados correctamente");
+            } else {
+              this.mostrarMensaje("error", "⚠️ No se pudo leer la guía o no se detectaron datos claros.");
+            }
+          },
+          error: (err) => {
+            console.error(err);
+            this.mostrarMensaje("error", "❌ Error al procesar la imagen. Intenta nuevamente.");
           }
+        });
 
-          if (resp.fechaAdmision) {
-            this.setFechaAdmisionFromString(resp.fechaAdmision);
-          }
+    } catch (e) {
+      console.error(e);
+      this.procesandoIA = false;
+      this.mostrarMensaje("error", "❌ No se pudo preparar la imagen.");
+      (event.target as HTMLInputElement).value = '';
+    }
+  }
 
-          this.mostrarMensaje("success", "✅ Datos de la guía cargados correctamente");
-        } else {
-          this.mostrarMensaje("error", "⚠️ No se pudo leer la guía o no se detectaron datos claros.");
-        }
-
-        event.target.value = '';
-      },
-      error: (err) => {
-        this.procesandoIA = false;
-        console.error(err);
-        this.mostrarMensaje("error", "❌ Error al procesar la imagen. Intenta nuevamente.");
-        event.target.value = '';
-      }
+  // === utilidades de imagen (optimización en el navegador) ===
+  private readAsDataURL(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onload = () => resolve(fr.result as string);
+      fr.onerror = reject;
+      fr.readAsDataURL(file);
     });
-}
+  }
+
+  private loadImage(src: string): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  private async compressImage(file: File, maxW = 1600, quality = 0.72): Promise<Blob> {
+    const dataUrl = await this.readAsDataURL(file);
+    const img = await this.loadImage(dataUrl);
+
+    const scale = Math.min(1, maxW / img.width);
+    const w = Math.round(img.width * scale);
+    const h = Math.round(img.height * scale);
+
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d')!;
+
+    // dibujo y pequeña mejora de nitidez (opcional)
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img, 0, 0, w, h);
+
+    const blob: Blob = await new Promise((resolve) =>
+      canvas.toBlob(b => resolve(b!), 'image/jpeg', quality)
+    );
+    return blob;
+  }
+
   // ======================
   // 🔍 Métodos regex (respaldo)
   // ======================
@@ -189,42 +245,26 @@ mostrarMensaje(tipo: "success" | "error", texto: string) {
     return match ? parseFloat(match[1].replace(/[.,]/g, '')) : null;
   }
 
-  // ✅ Recibe "01/11/2025 10:45" o "01-11-2025" y rellena los selects (Año, Mes, Día)
-private setFechaAdmisionFromString(fechaStr: string) {
-  if (!fechaStr) return;
+  // ✅ Recibe "01/11/2025 10:45" o "01-11-2025" y rellena selects
+  private setFechaAdmisionFromString(fechaStr: string) {
+    if (!fechaStr) return;
+    const soloFecha = fechaStr.trim().split(/\s+/)[0];
+    const m = soloFecha.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
+    if (!m) return;
 
-  // Tomar solo la parte de fecha (antes del espacio por si trae hora)
-  const soloFecha = fechaStr.trim().split(/\s+/)[0];
+    let a = parseInt(m[3], 10);
+    let b = parseInt(m[2], 10);
+    let c = parseInt(m[1], 10);
 
-  // Acepta dd/MM/yyyy, dd-MM-yyyy, MM/dd/yyyy, MM-dd-yyyy
-  const m = soloFecha.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{2,4})$/);
-  if (!m) return;
+    let dia = c, mes = b, anio = a;
+    if (c <= 12 && b > 12) { dia = b; mes = c; }
 
-  let a = parseInt(m[3], 10);
-  let b = parseInt(m[2], 10);
-  let c = parseInt(m[1], 10);
+    if (anio < 100) anio += 2000;
+    if (mes < 1 || mes > 12 || dia < 1 || dia > 31) return;
 
-  // Asumimos formato LATAM por defecto: dd/MM/yyyy
-  // Si parece MM/dd/yyyy (primer número <=12 y el segundo >12), lo intercambiamos.
-  let dia = c, mes = b, anio = a;
-  if (c <= 12 && b > 12) {
-    dia = b;
-    mes = c;
+    this.anioAdmision = anio;
+    this.mesAdmision = mes;
+    this.diaAdmision = dia;
+    this.actualizarFecha('admision');
   }
-
-  // Normaliza año de 2 dígitos
-  if (anio < 100) anio += 2000;
-
-  // Validación básica
-  if (mes < 1 || mes > 12 || dia < 1 || dia > 31) return;
-
-  this.anioAdmision = anio;
-  this.mesAdmision = mes;      // tu dropdown usa valores 1..12
-  this.diaAdmision = dia;
-
-  // Actualiza el modelo pedido.fechaAdmision
-  this.actualizarFecha('admision');
-}
-
-
 }
