@@ -1,8 +1,16 @@
 <!doctype html>
 <html lang="es" data-bs-theme="light">
 <head>
+   <script>
+    (function () {
+      const saved = localStorage.getItem('bs-theme');
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = saved || (prefersDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-bs-theme', theme);
+    })();
+  </script>
   <meta charset="utf-8">
-  <title>FrontendAngular</title>
+  <title>Seguimiento de Guias</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
