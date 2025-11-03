@@ -20,10 +20,7 @@ export class AgregarPedido implements OnInit {
   private enrutador = inject(Router);
   private http = inject(HttpClient);
 
-  // ======================
-  // 🔹 Variables del formulario
-  // ======================
-  modoIngreso: string = 'manual'; // 'manual' o 'ia'
+  modoIngreso: string = 'manual';
   estados = ['VIAJANDO', 'DISTRIBUCIÓN', 'REINTENTO', 'OFICINA', 'ENTREGADO', 'DEVOLUCIÓN', 'ARCHIVADO'];
 
   anioAdmision!: number;
@@ -49,7 +46,6 @@ export class AgregarPedido implements OnInit {
   ];
   dias: number[] = Array.from({ length: 31 }, (_, i) => i + 1);
 
-  // 🔹 Feedback/estado IA
   cargandoIA: boolean = false;
   mensajeIA: string = "";
   tipoMensajeIA: "success" | "error" | "" = "";
@@ -69,9 +65,6 @@ export class AgregarPedido implements OnInit {
     this.anios = [anioActual];
   }
 
-  // ======================
-  // 📅 Manejo de fechas
-  // ======================
   actualizarFecha(tipo: string) {
     switch (tipo) {
       case 'admision':
@@ -95,9 +88,6 @@ export class AgregarPedido implements OnInit {
     if (!this.tieneAdelanto) this.pedido.adelanto = null;
   }
 
-  // ======================
-  // 💾 Guardar pedido
-  // ======================
   onSubmit() {
     if (!this.pedido.fechaAdmision) {
       alert('La fecha de admisión es obligatoria');
@@ -117,15 +107,11 @@ export class AgregarPedido implements OnInit {
     this.enrutador.navigate(['/pedidos']);
   }
 
-  // ======================
-  // 🤖 Lógica mejorada para modo IA
-  // ======================
   async subirGuia(event: Event) {
     const input = event.target as HTMLInputElement;
     const file = input.files?.[0];
     if (!file) return;
 
-    // ✅ valida tipo de archivo
     if (!/^image\//.test(file.type)) {
       this.mostrarMensaje("error", "El archivo debe ser una imagen.");
       input.value = '';
@@ -136,15 +122,14 @@ export class AgregarPedido implements OnInit {
       this.procesandoIA = true;
       this.mostrarMensaje("success", "Procesando la imagen, por favor espera...");
 
-      // ⬇️ Comprime antes de subir (reduce tamaño x5–x10)
-      const blob = await this.compressImage(file, 1600, 0.72); // ancho máx 1600px, calidad 72%
+      const blob = await this.compressImage(file, 1600, 0.72);
       const formData = new FormData();
       formData.append('file', new File([blob], file.name.replace(/\.\w+$/, '.jpg'), { type: 'image/jpeg' }));
 
       this.http.post<any>('http://localhost:8080/seguimiento-app/pedidos/agregar-pedido', formData)
         .pipe(finalize(() => {
           this.procesandoIA = false;
-          input.value = ''; // reset input
+          input.value = '';
         }))
         .subscribe({
           next: (resp) => {
@@ -179,7 +164,6 @@ export class AgregarPedido implements OnInit {
     }
   }
 
-  // === utilidades de imagen (optimización en el navegador) ===
   private readAsDataURL(file: File): Promise<string> {
     return new Promise((resolve, reject) => {
       const fr = new FileReader();
@@ -211,7 +195,6 @@ export class AgregarPedido implements OnInit {
     canvas.height = h;
     const ctx = canvas.getContext('2d')!;
 
-    // dibujo y pequeña mejora de nitidez (opcional)
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'high';
     ctx.drawImage(img, 0, 0, w, h);
@@ -222,9 +205,6 @@ export class AgregarPedido implements OnInit {
     return blob;
   }
 
-  // ======================
-  // 🔍 Métodos regex (respaldo)
-  // ======================
   private extraerNumeroGuia(texto: string): string {
     const match = texto.match(/gu[ií]a\s*(\d{6,})/i);
     return match ? match[1] : '';
@@ -245,7 +225,6 @@ export class AgregarPedido implements OnInit {
     return match ? parseFloat(match[1].replace(/[.,]/g, '')) : null;
   }
 
-  // ✅ Recibe "01/11/2025 10:45" o "01-11-2025" y rellena selects
   private setFechaAdmisionFromString(fechaStr: string) {
     if (!fechaStr) return;
     const soloFecha = fechaStr.trim().split(/\s+/)[0];

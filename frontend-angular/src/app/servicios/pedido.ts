@@ -18,11 +18,11 @@ export class PedidoService {
     return this.clienteHttp.post(this.urlBase, pedido);
   }
 
-  obtenerPedidoPorId(id: number){
+  obtenerPedidoPorId(id: number) {
     return this.clienteHttp.get<Pedido>(`${this.urlBase}/${id}`);
   }
 
-  editarPedido(id:number, pedido:Pedido) {
+  editarPedido(id: number, pedido: Pedido) {
     return this.clienteHttp.put(`${this.urlBase}/${id}`, pedido);
   }
 

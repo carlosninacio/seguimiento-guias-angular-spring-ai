@@ -16,15 +16,14 @@ export class CrearRotulos {
   private router = inject(Router);
   private http = inject(HttpClient);
 
-  // endpoint que ya hicimos
   private url = 'http://localhost:8080/seguimiento-app/pedidos/crear-rotulos';
 
   form: Rotulo = { nombre: '', numero: '', detalle: '', iniciales: '', repartidora: '' };
   rotulos = signal<Rotulo[]>([]);
 
   onSubmit() {
-  this.addWord();
-}
+    this.addWord();
+  }
 
   addWord() {
     if (!this.form.nombre.trim() || !this.form.numero.trim()) return;
@@ -45,7 +44,6 @@ export class CrearRotulos {
         const a = document.createElement('a');
         a.href = url; a.download = 'rotulos.docx'; a.click();
         URL.revokeObjectURL(url);
-        // ✅ vaciar la lista local después de guardar
         this.rotulos.set([]);
       },
       error: () => alert('No se pudo generar el Word')

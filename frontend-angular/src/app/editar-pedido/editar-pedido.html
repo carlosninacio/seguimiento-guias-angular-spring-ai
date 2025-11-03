@@ -1,161 +1,139 @@
-<!-- Modal de Edición de Pedido -->
-<div class="modal fade show" id="editarPedidoModal" tabindex="-1"
-     aria-labelledby="editarPedidoLabel"
-     aria-modal="true" role="dialog"
-     data-bs-backdrop="static" data-bs-keyboard="false"
-     style="display: block; background-color: rgba(0, 0, 0, 0.55); backdrop-filter: blur(3px);">
+<div class="modal fade show" id="editarPedidoModal" tabindex="-1" aria-labelledby="editarPedidoLabel" aria-modal="true"
+  role="dialog" data-bs-backdrop="static" data-bs-keyboard="false"
+  style="display: block; background-color: rgba(0, 0, 0, 0.55); backdrop-filter: blur(3px);">
 
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content bg-body shadow-lg border-0 rounded-4">
 
-      <!-- 🔹 Encabezado -->
       <div class="modal-header bg-primary text-white rounded-top-4">
         <h5 class="modal-title fw-semibold" id="editarPedidoLabel">
           <i class="bi bi-pencil-square me-2"></i>Editar Pedido
         </h5>
       </div>
 
-      <!-- 🧾 Cuerpo -->
       <div class="modal-body">
         <form (ngSubmit)="onSubmit()" autocomplete="off" class="text-body">
 
-          <!-- Número de guía -->
           <div class="mb-3">
             <label for="numeroGuia" class="form-label fw-semibold">Número de Guía</label>
-            <input type="text" class="form-control" id="numeroGuia" name="numeroGuia"
-                   [(ngModel)]="pedido.numeroGuia" required>
+            <input type="text" class="form-control" id="numeroGuia" name="numeroGuia" [(ngModel)]="pedido.numeroGuia"
+              required>
           </div>
 
-          <!-- Destino -->
           <div class="mb-3">
             <label for="destino" class="form-label fw-semibold">Destino</label>
-            <input type="text" class="form-control" id="destino" name="destino"
-                   [(ngModel)]="pedido.destino">
+            <input type="text" class="form-control" id="destino" name="destino" [(ngModel)]="pedido.destino">
           </div>
 
-          <!-- Cliente -->
           <div class="mb-3">
             <label for="nombreCliente" class="form-label fw-semibold">Nombre del Cliente</label>
             <input type="text" class="form-control" id="nombreCliente" name="nombreCliente"
-                   [(ngModel)]="pedido.nombreCliente">
+              [(ngModel)]="pedido.nombreCliente">
           </div>
 
-          <!-- Fecha Admisión -->
           <div class="mb-3">
             <label class="form-label fw-semibold">Fecha de Admisión *</label>
             <div class="d-flex gap-2">
               <select class="form-select" [(ngModel)]="anioAdmision" name="anioAdmision"
-                      (change)="actualizarFecha('admision')" required>
+                (change)="actualizarFecha('admision')" required>
                 <option value="">Año</option>
                 <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
               </select>
 
               <select class="form-select" [(ngModel)]="mesAdmision" name="mesAdmision"
-                      (change)="actualizarFecha('admision')" required>
+                (change)="actualizarFecha('admision')" required>
                 <option value="">Mes</option>
                 <option *ngFor="let mes of meses" [value]="mes.valor">{{ mes.nombre }}</option>
               </select>
 
               <select class="form-select" [(ngModel)]="diaAdmision" name="diaAdmision"
-                      (change)="actualizarFecha('admision')" required>
+                (change)="actualizarFecha('admision')" required>
                 <option value="">Día</option>
                 <option *ngFor="let dia of dias" [value]="dia">{{ dia }}</option>
               </select>
             </div>
           </div>
 
-          <!-- Estado -->
           <div class="mb-3">
             <label for="estadoPedido" class="form-label fw-semibold">Estado del Pedido</label>
-            <select class="form-select" id="estadoPedido" name="estadoPedido"
-                    [(ngModel)]="pedido.estadoPedido">
+            <select class="form-select" id="estadoPedido" name="estadoPedido" [(ngModel)]="pedido.estadoPedido">
               <option value="">Seleccione estado</option>
               <option *ngFor="let estado of estados" [value]="estado">{{ estado }}</option>
             </select>
           </div>
 
-          <!-- Valor -->
           <div class="mb-3">
             <label for="valor" class="form-label fw-semibold">Valor</label>
-            <input type="number" class="form-control" id="valor" name="valor"
-                   [(ngModel)]="pedido.valor">
+            <input type="number" class="form-control" id="valor" name="valor" [(ngModel)]="pedido.valor">
           </div>
 
-          <!-- Fecha Revisión -->
           <div class="mb-3">
             <label class="form-label fw-semibold">Fecha de Revisión</label>
             <div class="d-flex gap-2">
               <select class="form-select" [(ngModel)]="anioRevision" name="anioRevision"
-                      (change)="actualizarFecha('revision')">
+                (change)="actualizarFecha('revision')">
                 <option value="">Año</option>
                 <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
               </select>
               <select class="form-select" [(ngModel)]="mesRevision" name="mesRevision"
-                      (change)="actualizarFecha('revision')">
+                (change)="actualizarFecha('revision')">
                 <option value="">Mes</option>
                 <option *ngFor="let mes of meses" [value]="mes.valor">{{ mes.nombre }}</option>
               </select>
               <select class="form-select" [(ngModel)]="diaRevision" name="diaRevision"
-                      (change)="actualizarFecha('revision')">
+                (change)="actualizarFecha('revision')">
                 <option value="">Día</option>
                 <option *ngFor="let dia of dias" [value]="dia">{{ dia }}</option>
               </select>
             </div>
           </div>
 
-          <!-- Fecha Archivado -->
           <div class="mb-3">
             <label class="form-label fw-semibold">Fecha de Archivado</label>
             <div class="d-flex gap-2">
               <select class="form-select" [(ngModel)]="anioArchivado" name="anioArchivado"
-                      (change)="actualizarFecha('archivado')">
+                (change)="actualizarFecha('archivado')">
                 <option value="">Año</option>
                 <option *ngFor="let anio of anios" [value]="anio">{{ anio }}</option>
               </select>
               <select class="form-select" [(ngModel)]="mesArchivado" name="mesArchivado"
-                      (change)="actualizarFecha('archivado')">
+                (change)="actualizarFecha('archivado')">
                 <option value="">Mes</option>
                 <option *ngFor="let mes of meses" [value]="mes.valor">{{ mes.nombre }}</option>
               </select>
               <select class="form-select" [(ngModel)]="diaArchivado" name="diaArchivado"
-                      (change)="actualizarFecha('archivado')">
+                (change)="actualizarFecha('archivado')">
                 <option value="">Día</option>
                 <option *ngFor="let dia of dias" [value]="dia">{{ dia }}</option>
               </select>
             </div>
           </div>
 
-          <!-- Adelanto -->
           <div class="mb-3">
             <label class="form-label fw-semibold">¿Tiene adelanto?</label>
             <div class="form-check form-switch">
-              <input class="form-check-input" type="checkbox" id="tieneAdelanto"
-                     [(ngModel)]="tieneAdelanto" name="tieneAdelanto"
-                     (change)="toggleAdelanto()">
+              <input class="form-check-input" type="checkbox" id="tieneAdelanto" [(ngModel)]="tieneAdelanto"
+                name="tieneAdelanto" (change)="toggleAdelanto()">
               <label class="form-check-label" for="tieneAdelanto">Sí</label>
             </div>
 
             <div class="mt-2" *ngIf="tieneAdelanto">
               <label for="adelanto" class="form-label fw-semibold">Valor del Adelanto</label>
-              <input type="number" class="form-control" id="adelanto" name="adelanto"
-                     [(ngModel)]="pedido.adelanto" [required]="tieneAdelanto">
+              <input type="number" class="form-control" id="adelanto" name="adelanto" [(ngModel)]="pedido.adelanto"
+                [required]="tieneAdelanto">
             </div>
           </div>
 
-          <!-- Unidades -->
           <div class="mb-3">
             <label for="unidades" class="form-label fw-semibold">Unidades</label>
-            <input type="number" class="form-control" id="unidades" name="unidades"
-                   [(ngModel)]="pedido.unidades">
+            <input type="number" class="form-control" id="unidades" name="unidades" [(ngModel)]="pedido.unidades">
           </div>
 
-          <!-- Botones -->
           <div class="text-center mt-4">
             <button type="submit" class="btn btn-primary px-4 me-3 shadow-sm">
               <i class="bi bi-save me-1"></i>Guardar
             </button>
-            <button type="button" class="btn btn-outline-danger px-4 shadow-sm"
-                    (click)="cerrarModal()">
+            <button type="button" class="btn btn-outline-danger px-4 shadow-sm" (click)="cerrarModal()">
               <i class="bi bi-x-circle"></i> Cancelar
             </button>
           </div>

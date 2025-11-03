@@ -40,7 +40,6 @@ public class PedidoControlador {
     @Autowired
     private PedidoServicio pedidoServicio;
 
-    // 🔹 Listar todos los pedidos
     @GetMapping
     public List<Pedido> obtenerPedidos() {
         List<Pedido> pedidos = this.pedidoServicio.listarPedidos();
@@ -49,14 +48,12 @@ public class PedidoControlador {
         return pedidos;
     }
 
-    // 🔹 Agregar nuevo pedido (cuando se guarda manualmente)
     @PostMapping
     public Pedido agregarPedido(@RequestBody Pedido pedido) {
         logger.info("Pedido a agregar: {}", pedido);
         return this.pedidoServicio.guardarPedido(pedido);
     }
 
-    // 🔹 Buscar pedido por ID
     @GetMapping("/{id}")
     public ResponseEntity<Pedido> obtenerPedidoPorId(@PathVariable int id) {
         Pedido pedido = this.pedidoServicio.buscarPedidoPorId(id);
@@ -67,7 +64,6 @@ public class PedidoControlador {
         }
     }
 
-    // 🔹 Actualizar pedido existente
     @PutMapping("/{id}")
     public ResponseEntity<Pedido> actualizarPedido(
             @PathVariable int id,
@@ -93,7 +89,6 @@ public class PedidoControlador {
         return ResponseEntity.ok(pedido);
     }
 
-    // 🔹 Eliminar pedido
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Boolean>> eliminarPedido(@PathVariable int id) {
         Pedido pedido = this.pedidoServicio.buscarPedidoPorId(id);
@@ -135,7 +130,6 @@ public class PedidoControlador {
         try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
             Sheet sheet = workbook.createSheet("Pedidos");
 
-            // Encabezados
             String[] columnas = { "Guía", "Destino", "Cliente", "Fecha Admisión", "Estado", "Valor",
                     "Fecha Revisión", "Fecha Archivado", "Adelanto", "Unidades" };
 
@@ -145,7 +139,6 @@ public class PedidoControlador {
                 cell.setCellValue(columnas[i]);
             }
 
-            // Datos
             int fila = 1;
             for (Pedido p : pedidos) {
                 Row row = sheet.createRow(fila++);
@@ -161,7 +154,6 @@ public class PedidoControlador {
                 row.createCell(9).setCellValue(p.getUnidades() != null ? p.getUnidades() : 0);
             }
 
-            // Auto-size
             for (int i = 0; i < columnas.length; i++) {
                 sheet.autoSizeColumn(i);
             }
@@ -201,9 +193,9 @@ public class PedidoControlador {
                 var cell = r.getCell(j);
                 cell.removeParagraph(0);
 
-                // párrafo nuevo
+
                 var p = cell.addParagraph();
-                p.setSpacingAfter(100); // espacio entre rótulos opcional
+                p.setSpacingAfter(100);
 
                 var run = p.createRun();
                 run.setFontFamily("Calibri");
@@ -212,7 +204,6 @@ public class PedidoControlador {
                 if (idx < rotulos.size()) {
                     var m = rotulos.get(idx++);
 
-                    // ✅ Saltos de línea reales:
                     run.setText(s(m.get("nombre")));
                     run.addBreak();
                     run.setText(s(m.get("numero")));

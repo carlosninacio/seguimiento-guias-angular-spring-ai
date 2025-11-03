@@ -1,4 +1,3 @@
-// src/app/servicios/theme.service.ts
 import { Injectable } from '@angular/core';
 
 type Theme = 'light' | 'dark';
