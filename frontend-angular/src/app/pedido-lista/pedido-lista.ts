@@ -96,6 +96,20 @@ export class PedidoLista {
     }
   }
 
+  rowClass(estado: string): string {
+    const base = 'align-middle border-start border-4';
+    switch ((estado || '').toUpperCase()) {
+      case 'ENTREGADO': return `${base} border-success`;
+      case 'DEVOLUCIÓN': return `${base} border-danger`;
+      case 'REINTENTO': return `${base} border-warning`;
+      case 'VIAJANDO': return `${base} border-primary`;
+      case 'DISTRIBUCIÓN': return `${base} border-info`;
+      case 'OFICINA': return `${base} border-secondary`;
+      case 'ARCHIVADO': return `${base} border-dark`;
+      default: return `${base} border-light`;
+    }
+  }
+
 
   private pedidoServicio = inject(PedidoService);
   private enrutador = inject(Router);

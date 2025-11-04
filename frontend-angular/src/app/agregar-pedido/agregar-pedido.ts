@@ -116,6 +116,7 @@ export class AgregarPedido implements OnInit {
       this.mostrarMensaje("error", "El archivo debe ser una imagen.");
       input.value = '';
       return;
+
     }
 
     try {
@@ -144,6 +145,13 @@ export class AgregarPedido implements OnInit {
               }
 
               if (resp.fechaAdmision) this.setFechaAdmisionFromString(resp.fechaAdmision);
+
+              if (resp.nombreCliente)
+                this.pedido.nombreCliente = this.normalizarNombreCliente(resp.nombreCliente);
+
+              if (resp.destino)
+                this.pedido.destino = this.normalizarDestino(resp.destino);
+
 
               this.mostrarMensaje("success", "✅ Datos de la guía cargados correctamente");
             } else {
@@ -245,5 +253,27 @@ export class AgregarPedido implements OnInit {
     this.mesAdmision = mes;
     this.diaAdmision = dia;
     this.actualizarFecha('admision');
+  }
+
+  normalizarNombreCliente(nombre: string): string {
+    if (!nombre) return '';
+    let limpio = nombre.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s]/g, '');
+    limpio = limpio.trim().replace(/\s{2,}/g, ' ');
+    return limpio
+      .toLowerCase()
+      .split(' ')
+      .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+      .join(' ');
+  }
+
+  normalizarDestino(destino: string): string {
+    if (!destino) return '';
+    let limpio = destino.replace(/[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\s/,\-]/g, '');
+    limpio = limpio.replace(/\//g, ',').trim().replace(/\s{2,}/g, ' ');
+    return limpio
+      .toLowerCase()
+      .split(' ')
+      .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+      .join(' ');
   }
 }

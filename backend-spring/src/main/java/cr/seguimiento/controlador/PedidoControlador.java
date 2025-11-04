@@ -10,28 +10,37 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.*;
-
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+
 import java.util.List;
 
-import cr.seguimiento.modelo.Pedido;
-import cr.seguimiento.servicio.PedidoServicio;
+
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
+import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFFont;
+
+
+import java.awt.Color;
+
+import java.util.HashMap;
+
+import java.util.Map;
+import java.util.function.BiFunction;
+
 
 @RestController
-@RequestMapping("/seguimiento-app/pedidos") // ✅ Ajuste clave para coincidir con el front
+@RequestMapping("/seguimiento-app/pedidos")
 @CrossOrigin(origins = "http://localhost:4200")
 public class PedidoControlador {
 
@@ -127,53 +136,110 @@ public class PedidoControlador {
     public ResponseEntity<byte[]> exportarPedidosAExcel() throws IOException {
         List<Pedido> pedidos = pedidoServicio.listarPedidos();
 
-        try (Workbook workbook = new XSSFWorkbook(); ByteArrayOutputStream bos = new ByteArrayOutputStream()) {
-            Sheet sheet = workbook.createSheet("Pedidos");
+        try (Workbook wb = new XSSFWorkbook()) {
+            Sheet sheet = wb.createSheet("Pedidos");
 
-            String[] columnas = { "Guía", "Destino", "Cliente", "Fecha Admisión", "Estado", "Valor",
-                    "Fecha Revisión", "Fecha Archivado", "Adelanto", "Unidades" };
 
-            Row header = sheet.createRow(0);
-            for (int i = 0; i < columnas.length; i++) {
-                Cell cell = header.createCell(i);
-                cell.setCellValue(columnas[i]);
+            String[] cols = {"Guía", "Destino", "Cliente", "Fecha Admisión", "Estado",
+                    "Valor", "Fecha Revisión", "Fecha Archivado", "Adelanto", "Unidades"};
+
+
+            CellStyle header = wb.createCellStyle();
+            Font hfont = wb.createFont();
+            hfont.setBold(true);
+            hfont.setColor(IndexedColors.WHITE.getIndex());
+            header.setFont(hfont);
+            header.setFillForegroundColor(IndexedColors.BLUE.getIndex());
+            header.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            header.setAlignment(HorizontalAlignment.CENTER);
+            header.setVerticalAlignment(VerticalAlignment.CENTER);
+
+            Row h = sheet.createRow(0);
+            for (int i = 0; i < cols.length; i++) {
+                Cell c = h.createCell(i);
+                c.setCellValue(cols[i]);
+                c.setCellStyle(header);
             }
 
-            int fila = 1;
+
+            Map<String, CellStyle> estilos = crearEstilosEstados((XSSFWorkbook) wb);
+
+
+            int r = 1;
             for (Pedido p : pedidos) {
-                Row row = sheet.createRow(fila++);
-                row.createCell(0).setCellValue(p.getNumeroGuia() != null ? p.getNumeroGuia() : "");
-                row.createCell(1).setCellValue(p.getDestino() != null ? p.getDestino() : "");
-                row.createCell(2).setCellValue(p.getNombreCliente() != null ? p.getNombreCliente() : "");
-                row.createCell(3).setCellValue(p.getFechaAdmision() != null ? p.getFechaAdmision().toString() : "");
-                row.createCell(4).setCellValue(p.getEstadoPedido() != null ? p.getEstadoPedido() : "");
-                row.createCell(5).setCellValue(p.getValor() != null ? p.getValor() : 0);
-                row.createCell(6).setCellValue(p.getFechaRevision() != null ? p.getFechaRevision().toString() : "");
-                row.createCell(7).setCellValue(p.getFechaArchivado() != null ? p.getFechaArchivado().toString() : "");
-                row.createCell(8).setCellValue(p.getAdelanto() != null ? p.getAdelanto() : 0);
-                row.createCell(9).setCellValue(p.getUnidades() != null ? p.getUnidades() : 0);
+                Row row = sheet.createRow(r++);
+
+                row.createCell(0).setCellValue(nvl(p.getNumeroGuia()));
+                row.createCell(1).setCellValue(nvl(p.getDestino()));
+                row.createCell(2).setCellValue(nvl(p.getNombreCliente()));
+                row.createCell(3).setCellValue(p.getFechaAdmision() == null ? "" : p.getFechaAdmision().toString());
+                row.createCell(4).setCellValue(nvl(p.getEstadoPedido()));
+                row.createCell(5).setCellValue(p.getValor() == null ? 0 : p.getValor());
+                row.createCell(6).setCellValue(p.getFechaRevision() == null ? "" : String.valueOf(p.getFechaRevision()));
+                row.createCell(7).setCellValue(p.getFechaArchivado() == null ? "" : String.valueOf(p.getFechaArchivado()));
+                row.createCell(8).setCellValue(p.getAdelanto() == null ? 0 : p.getAdelanto());
+                row.createCell(9).setCellValue(p.getUnidades() == null ? 0 : p.getUnidades());
+
+                String estado = (p.getEstadoPedido() == null) ? "" : p.getEstadoPedido().toUpperCase();
+                CellStyle style = estilos.getOrDefault(estado, estilos.get("DEFAULT"));
+                for (int i = 0; i < cols.length; i++) {
+                    row.getCell(i).setCellStyle(style);
+                }
             }
 
-            for (int i = 0; i < columnas.length; i++) {
-                sheet.autoSizeColumn(i);
-            }
 
-            workbook.write(bos);
-            byte[] bytes = bos.toByteArray();
+            for (int i = 0; i < cols.length; i++) sheet.autoSizeColumn(i);
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.parseMediaType(
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
-            headers.set(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=pedidos.xlsx");
-            headers.setContentLength(bytes.length);
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            wb.write(out);
 
-            return new ResponseEntity<>(bytes, headers, HttpStatus.OK);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=pedidos.xlsx")
+                    .contentType(MediaType.parseMediaType(
+                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                    .body(out.toByteArray());
         }
     }
 
+    private String nvl(String s) {
+        return s == null ? "" : s;
+    }
+
+    private Map<String, CellStyle> crearEstilosEstados(XSSFWorkbook wb) {
+        Map<String, CellStyle> map = new HashMap<>();
+
+        BiFunction<Color, Short, CellStyle> mk = (awtColor, fontColor) -> {
+            XSSFCellStyle st = wb.createCellStyle();
+            st.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+            st.setFillForegroundColor(new XSSFColor((java.awt.Color) awtColor, null));
+            st.setBorderTop(BorderStyle.THIN);
+            st.setBorderBottom(BorderStyle.THIN);
+            st.setBorderLeft(BorderStyle.THIN);
+            st.setBorderRight(BorderStyle.THIN);
+            st.setVerticalAlignment(VerticalAlignment.CENTER);
+
+            XSSFFont f = wb.createFont();
+            f.setColor(fontColor);
+            st.setFont(f);
+            return st;
+        };
+
+        map.put("ENTREGADO", mk.apply(new java.awt.Color(209, 231, 221), IndexedColors.DARK_GREEN.getIndex())); // success
+        map.put("DEVOLUCIÓN", mk.apply(new java.awt.Color(248, 215, 218), IndexedColors.DARK_RED.getIndex()));    // danger
+        map.put("REINTENTO", mk.apply(new java.awt.Color(255, 243, 205), IndexedColors.BROWN.getIndex()));       // warning
+        map.put("VIAJANDO", mk.apply(new java.awt.Color(204, 229, 255), IndexedColors.BLUE.getIndex()));        // primary
+        map.put("DISTRIBUCIÓN", mk.apply(new java.awt.Color(207, 244, 252), IndexedColors.DARK_TEAL.getIndex()));   // info
+        map.put("OFICINA", mk.apply(new java.awt.Color(226, 227, 229), IndexedColors.GREY_80_PERCENT.getIndex())); // secondary
+        map.put("ARCHIVADO", mk.apply(new java.awt.Color(214, 216, 218), IndexedColors.GREY_80_PERCENT.getIndex())); // dark
+
+        map.put("DEFAULT", mk.apply(new java.awt.Color(238, 238, 238), IndexedColors.BLACK.getIndex()));
+        return map;
+    }
+
+
     @PostMapping("/crear-rotulos")
     public ResponseEntity<byte[]> generarWordRotulos(
-            @RequestBody java.util.List<java.util.Map<String,Object>> rotulos
+            @RequestBody java.util.List<java.util.Map<String, Object>> rotulos
     ) throws java.io.IOException {
 
         org.apache.poi.xwpf.usermodel.XWPFDocument doc = new org.apache.poi.xwpf.usermodel.XWPFDocument();

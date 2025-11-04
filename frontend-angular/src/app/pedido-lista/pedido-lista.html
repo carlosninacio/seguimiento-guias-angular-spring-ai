@@ -21,32 +21,35 @@
         </thead>
         <tbody>
           @for (pedido of pedidos; track pedido.idPedido) {
-          <tr [attr.data-id]="pedido.idPedido">
+          <tr>
             <td>{{ pedido.numeroGuia }}</td>
             <td>{{ pedido.destino }}</td>
             <td>{{ pedido.nombreCliente }}</td>
             <td>{{ pedido.fechaAdmision }}</td>
-            <td>{{ pedido.estadoPedido }}</td>
+
+            <td>
+              <span [class]="badgeClass(pedido.estadoPedido)">
+                {{ pedido.estadoPedido }}
+              </span>
+            </td>
+
             <td>{{ pedido.valor | currency:'$':'symbol':'1.0-0' }}</td>
             <td>{{ pedido.fechaRevision }}</td>
             <td>{{ pedido.fechaArchivado }}</td>
             <td>{{ pedido.adelanto | currency:'$':'symbol':'1.0-0' }}</td>
             <td>{{ pedido.unidades }}</td>
             <td class="text-center">
-              <div>
-                <button (click)="editarPedido(pedido.idPedido)"
-                  class="btn btn-warning btn-sm me-2 d-inline-flex align-items-center" title="Editar">
-                  <i class="bi bi-pencil"></i>
-                </button>
-                <button (click)="eliminarPedido(pedido.idPedido)"
-                  class="btn btn-danger btn-sm d-inline-flex align-items-center" title="Eliminar">
-                  <i class="bi bi-trash"></i>
-                </button>
-              </div>
+              <button (click)="editarPedido(pedido.idPedido)" class="btn btn-warning btn-sm me-2" title="Editar">
+                <i class="bi bi-pencil"></i>
+              </button>
+              <button (click)="eliminarPedido(pedido.idPedido)" class="btn btn-danger btn-sm" title="Eliminar">
+                <i class="bi bi-trash"></i>
+              </button>
             </td>
           </tr>
           }
         </tbody>
+
       </table>
     </div>
 
