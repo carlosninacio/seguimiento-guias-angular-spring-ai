@@ -1,17 +1,19 @@
 # 👟 Sistema de Gestión de Pedidos
 
-> Aplicación Full Stack para la administración de pedidos de calzado, desarrollada con **React**, **Spring Boot** y **MySQL**, que además **genera y actualiza automáticamente un archivo Excel** con los registros, facilitando la revisión y pago de pedidos en la empresa.
+> Aplicación **Full Stack** para la administración de pedidos de calzado, desarrollada con **React**, **Spring Boot** y **MySQL**, que integra **OCR con Tesseract (IA)** para lectura automática de guías y genera **rótulos personalizados en Word**.  
+> Además, **actualiza y exporta automáticamente un archivo Excel** con todos los pedidos, facilitando la gestión, revisión y control de pagos.
 
 ---
 
 ## 🧩 Descripción del Proyecto
 
-Este sistema permite **registrar, consultar, actualizar y eliminar pedidos** de manera sencilla y ordenada.  
-Fue diseñado con el objetivo de optimizar el proceso de control de pedidos en una empresa de venta de calzado, reemplazando el registro manual en Word y Excel por una **aplicación moderna y automatizada**.
+Este sistema reemplaza los procesos manuales en Word y Excel por una **solución moderna, automatizada y conectada**.  
+Permite **registrar, consultar, actualizar y eliminar pedidos** de forma rápida, además de procesar **imágenes de guías de envío** mediante **inteligencia artificial (OCR con Tesseract)**.
 
-Cada vez que se registra un pedido, el sistema:
-1. Guarda los datos en la base de datos **MySQL**.
-2. **Escribe y actualiza automáticamente** un archivo **Excel local**, que puede entregarse fácilmente a otras áreas (revisión, pagos, archivo, etc.).
+Cada vez que se registra o procesa un pedido, el sistema:
+1. Guarda los datos en la base de datos **MySQL**.  
+2. **Genera o actualiza automáticamente** un archivo **Excel local**.  
+3. Crea **rótulos en formato Word (.docx)** listos para imprimir y pegar en los paquetes.  
 
 ---
 
@@ -19,19 +21,74 @@ Cada vez que se registra un pedido, el sistema:
 
 ### 🖥️ Frontend
 - [React](https://reactjs.org/)
-- Axios
-- React Router DOM
-- HTML5 / CSS3 / Bootstrap
+- Axios  
+- React Router DOM  
+- HTML5 / CSS3 / Bootstrap  
 
 ### 🧠 Backend
-- [Spring Boot](https://spring.io/projects/spring-boot)
-- Spring Data JPA
-- Apache POI (para manejo de Excel)
-- MySQL Driver
-- Lombok (opcional)
+- [Spring Boot](https://spring.io/projects/spring-boot)  
+- Spring Data JPA  
+- Apache POI → Manejo y generación de archivos **Excel (.xlsx)**  
+- Apache POI + DOCX4J → Generación de **rótulos Word (.docx)**  
+- **Tesseract OCR** → Procesamiento de imágenes de guías (IA)  
+- MySQL Driver  
+- Lombok  
 
 ### 🗄️ Base de Datos
 - **MySQL 8+**
+
+---
+
+## 🤖 Integración con OCR (IA - Tesseract)
+
+El sistema incorpora **Tesseract OCR**, una librería de reconocimiento óptico de caracteres, para **leer automáticamente los datos de las guías escaneadas o fotografiadas**.
+
+Al subir una imagen:
+1. El backend procesa el archivo con **Google Tesseract**.  
+2. Extrae automáticamente el número de guía, destino, cliente y valores.  
+3. Crea o actualiza el pedido en la base de datos.  
+
+Esto elimina la digitación manual y reduce errores humanos en el registro de pedidos.
+
+---
+
+## 🧾 Generación de Rótulos en Word
+
+El sistema incluye una función para **generar rótulos personalizados (.docx)** por cada pedido.  
+Cada rótulo contiene:
+- Número de guía  
+- Destino  
+- Nombre del cliente  
+- Fecha de admisión  
+- Código de pedido o referencia  
+
+Los archivos Word pueden imprimirse directamente para el embalaje o archivo físico de los pedidos.
+
+> 📂 Los rótulos se generan automáticamente desde el backend usando **Apache POI / DOCX4J**, garantizando formato uniforme y profesional.
+
+---
+
+## 📊 Integración con Excel
+
+El backend incluye un servicio `ExcelService` que usa **Apache POI** para:
+- Crear el archivo `pedidos.xlsx` si no existe.  
+- Agregar o actualizar filas automáticamente con cada pedido nuevo.  
+- Mantener sincronizados los datos entre **MySQL y Excel**.  
+
+Archivo de salida:
+```
+backend-spring/src/main/resources/reportes/pedidos.xlsx
+```
+
+---
+## 🚀 Funcionalidades Principales
+
+✅ Registro, edición y eliminación de pedidos.  
+✅ **Lectura automática de guías** mediante OCR (IA).  
+✅ **Generación de rótulos en Word (.docx)**.  
+✅ **Exportación y sincronización de Excel (.xlsx)**.  
+✅ Interfaz web moderna e intuitiva (React + Bootstrap).  
+✅ Búsqueda, filtrado y gestión completa desde el navegador.  
 
 ---
 
@@ -55,22 +112,13 @@ Cada vez que se registra un pedido, el sistema:
 
 ---
 
-## 🚀 Funcionalidades Principales
-
-✅ Registro de pedidos con número de guía, destino, nombre, valor, abono, fechas y cantidad de pares.  
-✅ Actualización y eliminación de pedidos.  
-✅ Visualización de todos los pedidos desde la interfaz web.  
-✅ **Generación automática de Excel** con los datos sincronizados desde la base.  
-✅ Descarga del archivo Excel desde el frontend (opcional).  
-
----
-
 ## 🧭 Flujo General
 
-1. El usuario ingresa los datos del pedido desde la interfaz React.  
-2. El backend (Spring Boot) guarda la información en la base de datos.  
-3. El servicio `ExcelService` genera o actualiza el archivo `pedidos.xlsx`.  
-4. El Excel queda disponible para revisión o envío al área contable.
+1. El usuario registra o sube una guía desde la interfaz React.  
+2. El backend (Spring Boot) procesa la imagen con **Tesseract OCR**.  
+3. Los datos extraídos se guardan en **MySQL**.  
+4. Se actualiza el **Excel** y se genera el **rótulo Word**.  
+5. Todo queda disponible para descarga o impresión.  
 
 ---
 
@@ -122,10 +170,10 @@ backend-spring/src/main/resources/reportes/pedidos.xlsx
 
 ## 💡 Mejoras Futuras
 
-🚀 Panel de estadísticas por destino o estado del pedido.  
-📅 Exportación mensual automática.  
-🔍 Filtros y búsquedas avanzadas.  
-🧾 Integración con control de pagos o reportes contables.  
+🚀 Implementación de usuarios de tipo administrador y vendedor.  
+📅 Exportación automática de reportes mensuales.  
+🔍 Filtros avanzados por rango de fechas.  
+🧾 Dashboard de pagos y control contable.  
 
 ---
 
@@ -133,14 +181,14 @@ backend-spring/src/main/resources/reportes/pedidos.xlsx
 
 **Carlos Ramírez**  
 Desarrollador Java | React | Spring Boot | MySQL  
-📧 *[Tu correo profesional]*  
-🌐 [Tu perfil de GitHub](https://github.com/usuario)
+📧 *ingcirp@gmail.com*  
+🌐 [Tu perfil de GitHub](https://github.com/carlosninacio)
 
 ---
 
 ## 🏁 Estado del Proyecto
 
-> 🚧 En desarrollo — actualmente se trabaja en la integración completa del backend con Excel y la interfaz React.
+> 🧩 En desarrollo — Actualmente con OCR funcional, generación de rótulos Word y exportación automática a Excel.
 
 ---
 
