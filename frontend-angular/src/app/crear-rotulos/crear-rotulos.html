@@ -1,70 +1,75 @@
 <div class="container py-4">
-  <div class="shadow-lg p-4 rounded-4 bg-body-tertiary border-0">
-    <h4 class="mb-3 fw-bold text-primary text-center">
-      <i class="bi bi-tags"></i> Crear Rótulos
-    </h4>
+  <h4 class="mb-3">Crear rótulos</h4>
 
-    <form (ngSubmit)="onSubmit()" autocomplete="off" class="row g-3">
-      <div class="col-md-6">
-        <label class="form-label fw-semibold text-body">Nombre</label>
-        <input class="form-control" [(ngModel)]="form.nombre" name="nombre" required>
-      </div>
+  <form (ngSubmit)="onSubmit()" autocomplete="off" class="row g-3">
+    
+    <div class="col-md-6">
+      <label class="form-label">Nombre</label>
+      <input class="form-control" [(ngModel)]="form.nombre" name="nombre" required>
+    </div>
 
-      <div class="col-md-6">
-        <label class="form-label fw-semibold text-body">Número</label>
-        <input class="form-control" [(ngModel)]="form.numero" name="numero" required>
-      </div>
+    <div class="col-md-6">
+      <label class="form-label">Número</label>
+      <input class="form-control" [(ngModel)]="form.numero" name="numero" required>
+    </div>
 
-      <div class="col-12">
-        <label class="form-label fw-semibold text-body">Detalle (nº de pares y precio)</label>
-        <input class="form-control" [(ngModel)]="form.detalle" name="detalle" placeholder="Ej: 2 Pares — 189.900">
-      </div>
+    <!-- 🔹 Nuevo campo: Destino -->
+    <div class="col-md-12">
+      <label class="form-label">Destino</label>
+      <input class="form-control" [(ngModel)]="form.destino" name="destino">
+    </div>
 
-      <div class="col-md-6">
-        <label class="form-label fw-semibold text-body">Iniciales</label>
-        <input class="form-control" [(ngModel)]="form.iniciales" name="iniciales" placeholder="Ej: CR">
-      </div>
+    <div class="col-12">
+      <label class="form-label">Detalle (nº de pares y precio)</label>
+      <input class="form-control" [(ngModel)]="form.detalle" name="detalle" placeholder="Ej: 2 Pares — 189.900">
+    </div>
 
-      <div class="col-md-6">
-        <label class="form-label fw-semibold text-body">Repartidora</label>
-        <input class="form-control" [(ngModel)]="form.repartidora" name="repartidora" placeholder="Ej: YARITH">
-      </div>
+    <div class="col-md-6">
+      <label class="form-label">Iniciales</label>
+      <input class="form-control" [(ngModel)]="form.iniciales" name="iniciales" placeholder="Ej: CR">
+    </div>
 
-      <div class="col-12 d-flex justify-content-start gap-2 mt-3">
-        <button type="submit" class="btn btn-warning shadow-sm">
-          <i class="bi bi-plus-lg me-1"></i>Añadir
-        </button>
+    <div class="col-md-6">
+      <label class="form-label">Repartidora</label>
+      <input class="form-control" [(ngModel)]="form.repartidora" name="repartidora" placeholder="Ej: YARITH">
+    </div>
 
-        <button type="button" class="btn btn-primary shadow-sm d-flex align-items-center" (click)="guardarWord()">
-          <img src="/word.png" alt="Word" style="height:24px; width:24px; margin-right:8px;">
-          Guardar Word
-        </button>
+    <div class="col-12 d-flex justify-content-start gap-2 mt-2">
+      <button type="submit" class="btn btn-warning">
+        <i class="bi bi-plus-lg me-1"></i> Añadir
+      </button>
 
-        <button type="button" class="btn btn-outline-secondary shadow-sm" (click)="regresar()">
-          <i class="bi bi-arrow-left"></i> Regresar
-        </button>
-      </div>
-    </form>
-  </div>
+      <button type="button" class="btn btn-primary" (click)="guardarWord()">
+        <img src="/word.png" alt="Word" style="height:28px; width:28px; margin-right:8px;">
+        Guardar Word
+      </button>
 
-  <div class="mt-5">
-    <h6 class="mb-2 fw-semibold text-body">Rótulos añadidos ({{ rotulos().length }})</h6>
-    <div class="table-responsive shadow-sm rounded-3">
-      <table class="table table-sm table-hover align-middle mb-0">
-        <thead class="table-primary">
+      <button type="button" class="btn btn-outline-secondary" (click)="regresar()">
+        Regresar
+      </button>
+    </div>
+  </form>
+
+  <div class="mt-4">
+    <h6 class="mb-2">Rótulos añadidos ({{ rotulos().length }})</h6>
+    <div class="table-responsive">
+      <table class="table table-sm table-hover align-middle">
+        <thead class="table-light">
           <tr>
             <th>Nombre</th>
             <th>Número</th>
+            <th>Destino</th>
             <th>Detalle</th>
             <th>Iniciales</th>
             <th>Repartidora</th>
-            <th class="text-end">Acción</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let r of rotulos(); index as i">
             <td>{{ r.nombre }}</td>
             <td>{{ r.numero }}</td>
+            <td>{{ r.destino }}</td>
             <td>{{ r.detalle }}</td>
             <td>{{ r.iniciales }}</td>
             <td>{{ r.repartidora }}</td>
@@ -74,11 +79,8 @@
               </button>
             </td>
           </tr>
-
           <tr *ngIf="!rotulos().length">
-            <td colspan="6" class="text-muted text-center py-3">
-              Aún no has añadido rótulos.
-            </td>
+            <td colspan="7" class="text-muted">Aún no has añadido rótulos.</td>
           </tr>
         </tbody>
       </table>

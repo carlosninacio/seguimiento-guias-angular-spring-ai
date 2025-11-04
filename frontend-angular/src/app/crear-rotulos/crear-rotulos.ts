@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 
-type Rotulo = { nombre: string; numero: string; detalle: string; iniciales: string; repartidora: string };
+type Rotulo = { nombre: string; numero: string; destino: string;detalle: string; iniciales: string; repartidora: string };
 
 @Component({
   selector: 'app-crear-rotulos',
@@ -18,7 +18,14 @@ export class CrearRotulos {
 
   private url = 'http://localhost:8080/seguimiento-app/pedidos/crear-rotulos';
 
-  form: Rotulo = { nombre: '', numero: '', detalle: '', iniciales: '', repartidora: '' };
+  form: Rotulo = {
+  nombre: '',
+  numero: '',
+  destino: '',
+  detalle: '',
+  iniciales: '',
+  repartidora: ''
+};
   rotulos = signal<Rotulo[]>([]);
 
   onSubmit() {
@@ -28,7 +35,14 @@ export class CrearRotulos {
   addWord() {
     if (!this.form.nombre.trim() || !this.form.numero.trim()) return;
     this.rotulos.update(arr => [...arr, { ...this.form }]);
-    this.form = { nombre: '', numero: '', detalle: '', iniciales: '', repartidora: '' };
+    this.form = {
+  nombre: '',
+  numero: '',
+  destino: '',
+  detalle: '',
+  iniciales: '',
+  repartidora: ''
+};
   }
 
   quitar(i: number) {

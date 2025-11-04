@@ -174,14 +174,10 @@ public class PedidoServicio {
         return s;
     }
 
-    // 🔹 Normaliza el nombre del cliente
     public String normalizarNombreCliente(String nombre) {
         if (nombre == null) return "";
-        // Quita todo lo que no sea letra del alfabeto español o espacio
         String limpio = nombre.replaceAll("[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\\s]", "");
-        // Compacta espacios
         limpio = limpio.trim().replaceAll("\\s{2,}", " ");
-        // Capitaliza cada palabra
         String[] palabras = limpio.toLowerCase().split(" ");
         StringBuilder sb = new StringBuilder();
         for (String p : palabras) {
@@ -191,14 +187,11 @@ public class PedidoServicio {
         return sb.toString().trim();
     }
 
-    // 🔹 Normaliza el destino
     public String normalizarDestinoTexto(String destino) {
         if (destino == null) return "";
-        // Quita símbolos extraños y cambia "/" por ","
         String limpio = destino.replaceAll("[^A-Za-zÁÉÍÓÚÜÑáéíóúüñ\\s/,\\-]", "");
         limpio = limpio.replace("/", ",");
         limpio = limpio.trim().replaceAll("\\s{2,}", " ");
-        // Capitaliza cada palabra
         String[] palabras = limpio.toLowerCase().split(" ");
         StringBuilder sb = new StringBuilder();
         for (String p : palabras) {
