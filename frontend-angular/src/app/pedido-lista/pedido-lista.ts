@@ -4,10 +4,12 @@ import { PedidoService } from '../servicios/pedido';
 import { CurrencyPipe } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+
 
 @Component({
   selector: 'app-pedido-lista',
-  imports: [CurrencyPipe, CommonModule],
+  imports: [CurrencyPipe, CommonModule, FormsModule],
   templateUrl: './pedido-lista.html'
 })
 export class PedidoLista {
@@ -157,4 +159,19 @@ export class PedidoLista {
       error: (e) => console.error('Error descargando Excel', e)
     });
   }
+
+  estados: string[] = ['VIAJANDO', 'DISTRIBUCIÓN', 'REINTENTO', 'OFICINA', 'ENTREGADO', 'DEVOLUCIÓN', 'ARCHIVADO'];
+  filtroEstado: string = '';
+
+  get listaFiltrada() {
+    if (!this.pedidos) return [];
+    const f = (this.filtroEstado || '').trim().toUpperCase();
+    if (!f) return this.pedidos;
+    return this.pedidos.filter(p => (p.estadoPedido || '').toUpperCase() === f);
+  }
+
+  limpiarFiltro() {
+    this.filtroEstado = '';
+  }
+
 }
