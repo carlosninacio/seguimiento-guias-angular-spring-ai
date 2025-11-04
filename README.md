@@ -182,7 +182,7 @@ backend-spring/src/main/resources/reportes/pedidos.xlsx
 **Carlos Ramírez**  
 Desarrollador Java | React | Spring Boot | MySQL  
 📧 *ingcirp@gmail.com*  
-🌐 [Tu perfil de GitHub](https://github.com/carlosninacio)
+🌐 [GitHub/carlosninacio](https://github.com/carlosninacio)
 
 ---
 
