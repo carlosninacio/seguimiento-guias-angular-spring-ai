@@ -47,10 +47,10 @@ public class PedidoServicio {
         File tempFile = File.createTempFile("guia", ".jpg");
         file.transferTo(tempFile);
 
-        ITesseract tesseract = new Tesseract();
-
-
-        String tessDataPath = System.getenv("TESSDATA_PREFIX");
+        Tesseract tesseract = new Tesseract();
+        tesseract.setDatapath("C:\\Program Files\\Tesseract-OCR\\tessdata");
+        tesseract.setLanguage("spa");
+        
         if (tessDataPath != null) {
             tesseract.setDatapath(tessDataPath);
         }
